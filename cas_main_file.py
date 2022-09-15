@@ -4,6 +4,7 @@ from tkinter import *
 from tkinter import font
 from cas_managing_db import *
 from tkinter import messagebox
+from tkinter import ttk
 
 
 def main():
@@ -11,6 +12,15 @@ def main():
     root = Tk()
     root.title("CAS manager")
     root.geometry("650x450")
+
+    # Create a style
+    style = ttk.Style(root)
+
+    # Import the tcl file
+    root.tk.call("source", "Forest-ttk-theme/forest-dark.tcl")
+
+    # Set the theme with the theme_use method
+    style.theme_use("forest-dark")
 
     # functions for widgets
     # function initialize when switching between frames

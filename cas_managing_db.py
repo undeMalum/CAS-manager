@@ -53,7 +53,7 @@ def fetch_students(students_listbox: 'Listbox', chosen_class: str) -> None:
     c = sqlite3.connect("cas_db.db")
     cur = c.cursor()
     class_id = fetch_class(chosen_class)
-    prompt = "select first_name, surname from students where class_id = (:class_id) order by first_name;"
+    prompt = "select first_name, surname from students where class_id = (:class_id) order by surname;"
     cur.execute(prompt, {"class_id": class_id})
     available_students = cur.fetchall()
     if not available_students:
