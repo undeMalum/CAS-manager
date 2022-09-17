@@ -22,7 +22,7 @@ conn.close()
 
 
 # functions employing db: to be imported in main file
-def fetch_classes(listbox: 'Listbox') -> None:
+def fetch_classes(listbox: Listbox) -> None:
     c = sqlite3.connect("cas_db.db")
     cur = c.cursor()
     prompt = "select class_name from classes order by class_name;"
@@ -49,7 +49,7 @@ def fetch_class(class_name: str) -> int:
     return class_id
 
 
-def fetch_students(students_listbox: 'Listbox', chosen_class: str) -> None:
+def fetch_students(students_listbox: Listbox, chosen_class: str) -> None:
     c = sqlite3.connect("cas_db.db")
     cur = c.cursor()
     class_id = fetch_class(chosen_class)
@@ -64,7 +64,7 @@ def fetch_students(students_listbox: 'Listbox', chosen_class: str) -> None:
     c.close()
 
 
-def fetch_url(chosen_class: str, chosen_student: tuple) -> str:
+def fetch_url(chosen_class: str, chosen_student: tuple[str, str]) -> str:
     c = sqlite3.connect("cas_db.db")
     cur = c.cursor()
     class_id = fetch_class(chosen_class)
@@ -76,7 +76,7 @@ def fetch_url(chosen_class: str, chosen_student: tuple) -> str:
     return url
 
 
-def fetch_surname(chosen_class: str, surname: str) -> list:
+def fetch_surname(chosen_class: str, surname: str) -> list[str]:
     c = sqlite3.connect("cas_db.db")
     cur = c.cursor()
     class_id = fetch_class(chosen_class)
