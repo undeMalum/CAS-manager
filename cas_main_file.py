@@ -102,12 +102,11 @@ def main():
         searching_surname.delete(0, END)
         searching_surname.insert(0, "Enter surname")
 
-    def search_for_student(surname: str) -> None:
-        global store_class_name
-        if store_class_name == "":
+    def search_for_student(surname: str, chosen_class: str) -> None:
+        if not chosen_class:
             messagebox.showerror("Error", "Please choose a class or click 'Accept'!")
         else:
-            searching_students = fetch_surname(store_class_name[0], surname)
+            searching_students = fetch_surname(chosen_class[0], surname)
             if not searching_students:
                 students.focus_set()
                 messagebox.showerror("Error", "No students with given surname were found")
@@ -246,7 +245,7 @@ def main():
     searching_surname.insert(0, "Enter surname")
     searching_surname.bind("<FocusIn>", lambda e: searching_surname.delete(0, END))
     searching_surname.bind("<FocusOut>", lambda e: reset_searching_surname())
-    confirm_surname = Button(main_frame, text="Search", command=lambda: search_for_student(searching_surname.get()))
+    confirm_surname = Button(main_frame, text="Search", command=lambda: search_for_student(searching_surname.get(), ))
 
     # for displaying available students within the given class
     scrollbar_students = Scrollbar(main_frame)
