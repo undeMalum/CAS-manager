@@ -1,10 +1,12 @@
 from requests import get, exceptions
-from webbrowser import open
 from tkinter import *
 from tkinter import font
 from cas_managing_db import *
 from tkinter import messagebox
 from tkinter import ttk
+from src.frames.main_frame.searching_surname import EntrySurname
+from src.frames.main_frame.students_based_on_surname import search_for_student
+from src.frames.main_frame.go_to_url import go_url
 
 
 def main():
@@ -85,36 +87,6 @@ def main():
             fetch_students(students_listbox, chosen_class[0])
             global store_class_name
             store_class_name = chosen_class
-
-    def go_url(listbox_students: 'Listbox') -> None:
-        global store_class_name
-        selection = listbox_students.curselection()
-        if not selection or store_class_name == "":
-            messagebox.showerror("Error", "Please choose a student or click 'Accept'!")
-        # prevent fetching url if there's no students
-        elif listbox_students.get(selection) == "No students yet":
-            messagebox.showerror("Error", "Please add students first!")
-        else:
-            url = fetch_url(store_class_name[0], listbox_students.get(selection))
-            open(url)
-
-    def reset_searching_surname() -> None:
-        searching_surname.delete(0, END)
-        searching_surname.insert(0, "Enter surname")
-
-    def search_for_student(surname: str, chosen_class: str) -> None:
-        if not chosen_class:
-            messagebox.showerror("Error", "Please choose a class or click 'Accept'!")
-        else:
-            searching_students = fetch_surname(chosen_class[0], surname)
-            if not searching_students:
-                students.focus_set()
-                messagebox.showerror("Error", "No students with given surname were found")
-            else:
-                students.focus_set()  # enable searching_name to reset
-                # displaying all students whose surname meets the given one
-                students.delete(0, END)
-                [students.insert(END, each_found) for each_found in searching_students]
 
     def add_student(first_name: str, surname: str, class_name: tuple, url: str) -> None:
         if not class_name:
@@ -225,36 +197,72 @@ def main():
     f = font.Font(size=12)
 
     # creating main frame (using stored urls)
-    main_frame = Frame(root, height=650, width=450)
+    main_frame = Frame(
+        root,
+        height=650,
+        width=450
+    )
 
     # creating widgets inside the main frame
     # for displaying and searching through available classes
     temp_classes = Listbox(main_frame)  # listbox used only to make a margin; it won't be considered
-    scrollbar_classes = Scrollbar(temp_classes, width=12)
-    classes = Listbox(temp_classes, selectmode="single", yscrollcommand=scrollbar_classes.set, font=f, width=12,
-                      height=11, highlightthickness=0, borderwidth=0)
+
+    scrollbar_classes = Scrollbar(
+        temp_classes,
+        width=12
+    )
+
+    classes = Listbox(
+        temp_classes,
+        selectmode="single",
+        yscrollcommand=scrollbar_classes.set,
+        font=f,
+        width=12,
+        height=11,
+        highlightthickness=0,
+        borderwidth=0
+    )
+
     scrollbar_classes.config(command=classes.yview)
     # initial fulfillment of classes listbox
     fetch_classes(classes)
     # for confirming choice of class
-    class_chosen_url = Button(main_frame, text="Accept",
-                              command=lambda: accept_class(students, classes))
+    class_chosen_url = Button(
+        main_frame,
+        text="Accept",
+        command=lambda: accept_class(
+            students,
+            classes
+        )
+    )
 
     # for searching students based on their surname within given class
-    searching_surname = Entry(main_frame)
-    searching_surname.insert(0, "Enter surname")
-    searching_surname.bind("<FocusIn>", lambda e: searching_surname.delete(0, END))
-    searching_surname.bind("<FocusOut>", lambda e: reset_searching_surname())
-    confirm_surname = Button(main_frame, text="Search", command=lambda: search_for_student(searching_surname.get(), ))
+    searching_surname = EntrySurname(main_frame)
+    searching_surname.initial_settings("Enter surname")
+    confirm_surname = Button(
+        main_frame,
+        text="Search",
+        command=lambda: search_for_student(
+            students,
+            searching_surname.get(),
+            store_class_name
+        )
+    )
 
     # for displaying available students within the given class
     scrollbar_students = Scrollbar(main_frame)
-    students = Listbox(main_frame, selectmode="single", yscrollcommand=scrollbar_students.set, height=10, font=f)
+    students = Listbox(
+        main_frame,
+        selectmode="single",
+        yscrollcommand=scrollbar_students.set,
+        height=10,
+        font=f
+    )
     scrollbar_students.config(command=students.yview)
     # warning that reminds user of choosing class
     students.insert(END, "Choose class")
     # for redirecting users into the chosen student's portfolio
-    go_to_url = Button(main_frame, text="Go", command=lambda: go_url(students))
+    go_to_url = Button(main_frame, text="Go", command=lambda: go_url(students, store_class_name))
 
     # going to other functionalities of the program, ie adding/updating and removing elements
     go_to_add_main = Button(main_frame, text="Add/Update", height=3, command=lambda: move(main_frame, add_frame,

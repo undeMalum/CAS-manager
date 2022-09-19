@@ -1,25 +1,6 @@
 import sqlite3
 from tkinter import END, Listbox, DISABLED, NORMAL
 
-# creating database with 2 table; classes and students
-conn = sqlite3.connect("cas_db.db")
-cursor = conn.cursor()
-
-cursor.execute("""create table if not exists classes(
-                class_id integer primary key,
-                class_name text not null unique
-                );""")
-
-cursor.execute("""create table if not exists students(
-                first_name text not null,
-                surname text not null,
-                class_id integer,
-                url text not null,
-                foreign key (class_id) references classes(class_id)
-                );""")
-
-conn.close()
-
 
 # functions employing db: to be imported in main file
 def fetch_classes(listbox: Listbox) -> None:
@@ -49,18 +30,6 @@ def fetch_class(class_name: str) -> int:
     return class_id
 
 
-def fetch_surname(chosen_class: str, surname: str) -> list[str]:
-    c = sqlite3.connect("cas_db.db")
-    cur = c.cursor()
-    class_id = fetch_class(chosen_class)
-    prompt = """select first_name, surname from students where class_id = (:class_id) and surname = (:surname) 
-    order by first_name;"""
-    cur.execute(prompt, {"class_id": class_id, "surname": surname})
-    searching_student = cur.fetchall()
-    c.close()
-    return searching_student
-
-
 def fetch_students(students_listbox: Listbox, chosen_class: str) -> None:
     c = sqlite3.connect("cas_db.db")
     cur = c.cursor()
@@ -74,18 +43,6 @@ def fetch_students(students_listbox: Listbox, chosen_class: str) -> None:
     else:
         [students_listbox.insert(END, each_class) for each_class in available_students]
     c.close()
-
-
-def fetch_url(chosen_class: str, chosen_student: tuple[str, str]) -> str:
-    c = sqlite3.connect("cas_db.db")
-    cur = c.cursor()
-    class_id = fetch_class(chosen_class)
-    prompt = """select url from students where class_id = (:class_id) and first_name = (:first_name)
-    and surname = (:surname);"""
-    cur.execute(prompt, {"class_id": class_id, "first_name": chosen_student[0], "surname": chosen_student[1]})
-    url = cur.fetchone()[0]
-    c.close()
-    return url
 
 
 def insert_student(first_name: str, surname: str, chosen_class: str, url: str) -> None:
