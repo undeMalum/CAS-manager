@@ -15,13 +15,15 @@ def update_classes(classes_listbox: Listbox, students_listbox: Listbox):
     fetch_classes(classes_listbox)
     # add_frame has no listbox displaying students, therefore students_listbox is set to temp listbox
     # making no changes
+
+    # make changes in how widgets gets disabled!!!!
     if classes_listbox == classes_display_add:
-        # enable searching_name to reset
-        classes_listbox.focus_set()
         if add_mode.get() == 3:  # if new class mode was chosen, listbox displaying classes must stay disabled
             classes_listbox.config(state=DISABLED)
         return
 
+    # enable searching_name to reset
+    classes_listbox.focus_set()
     students_listbox.delete(0, END)
     students_listbox.insert(END, "Choose class")
 

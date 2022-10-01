@@ -1,6 +1,7 @@
 from tkinter import Listbox, messagebox
 from webbrowser import open
 from sqlite3 import connect
+
 from ..cas_managing_db_two import fetch_class
 
 

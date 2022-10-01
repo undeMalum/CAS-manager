@@ -1,5 +1,5 @@
-import sqlite3
 from tkinter import END, Listbox, DISABLED, NORMAL
+import sqlite3
 
 
 # functions employing db: to be imported in main file

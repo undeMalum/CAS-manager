@@ -28,14 +28,20 @@ def fetch_classes(listbox: Listbox) -> None:
     prompt = "select class_name from classes order by class_name;"
     cur.execute(prompt)
     available_classes = cur.fetchall()
-    if not available_classes:
-        listbox.delete(0, END)
-        listbox.insert(END, "Add classes")
-        listbox.config(state=DISABLED)
-    else:
+
+    # it is needed to somehow simplify these if statements
+    state = str(listbox["state"])  # if the state is disabled, we must change it to provide new data
+    if state == "disabled":
         listbox.config(state=NORMAL)
-        listbox.delete(0, END)
+
+    listbox.delete(0, END)  # clear what is currently written
+    if not available_classes:  # if there are no classes, give appropriate message
+        listbox.insert(END, "Add classes")
+    else:
         [listbox.insert(END, each_class) for each_class in available_classes]
+
+    listbox["state"] = state  # comeback to the original state
+
     c.close()
 
 
