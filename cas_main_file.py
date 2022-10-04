@@ -36,14 +36,16 @@ def main():
         previous_frame.place_forget()
         next_frame.pack()
         next_frame.place(relx=0.5, rely=0.5, anchor=CENTER)
+
         # refresh listbox displaying classes as some changes may occur
         fetch_classes(classes_listbox)
+
+        # enable searching_name to reset
+        classes_listbox.focus_set()
 
         if students_listbox is None:
             return
 
-        # enable searching_name to reset
-        classes_listbox.focus_set()
         # reset students
         students_listbox.delete(0, END)
         students_listbox.insert(END, "Choose class")

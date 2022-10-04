@@ -1,29 +1,30 @@
-from tkinter import Button, Frame, CENTER, Listbox, DISABLED, END
+from tkinter import Button, Frame, CENTER, Listbox, END
 
 from .cas_managing_db_two import fetch_classes
 
 
 def change_frame(previous_frame: Frame, next_frame: Frame):
+    # make previous frame disappear
     previous_frame.pack_forget()
     previous_frame.place_forget()
+
+    # change to next frame
     next_frame.pack()
     next_frame.place(relx=0.5, rely=0.5, anchor=CENTER)
 
 
-def update_classes(classes_listbox: Listbox, students_listbox: Listbox):
+def update_classes(classes_listbox: Listbox, students_listbox: Listbox = None):
     # refresh listbox displaying classes as some changes may occur
     fetch_classes(classes_listbox)
-    # add_frame has no listbox displaying students, therefore students_listbox is set to temp listbox
-    # making no changes
-
-    # make changes in how widgets gets disabled!!!!
-    if classes_listbox == classes_display_add:
-        if add_mode.get() == 3:  # if new class mode was chosen, listbox displaying classes must stay disabled
-            classes_listbox.config(state=DISABLED)
-        return
 
     # enable searching_name to reset
     classes_listbox.focus_set()
+
+    # add_frame has no listbox displaying students
+    if students_listbox is None:
+        return
+
+    # reset students
     students_listbox.delete(0, END)
     students_listbox.insert(END, "Choose class")
 
