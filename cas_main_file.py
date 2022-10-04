@@ -69,18 +69,23 @@ def main():
             global store_class_name
             store_class_name = chosen_class
 
-    def add_student(first_name: str, surname: str, class_name: tuple, url: str) -> str:
-        if not class_name:
-            return messagebox.showerror("Error", "Please choose a class!")
+    def all_parameters_given(widgets: list) -> str:
+        for widget in widgets:
+            if not widget:
+                return messagebox.showerror("Error", "Please fill all gaps!")
 
-        if not first_name or not surname or not url:
-            return messagebox.showerror("Error", "Please fill all gaps!")
-
-        # check whether the given url exists
+    def url_exists(url: str) -> str:
         try:
             get(url)
         except exceptions.RequestException:
             return messagebox.showerror("Error", "Given website does not exist!")
+
+    def add_student(first_name: str, surname: str, class_name: tuple, url: str) -> None:
+        # make sure all parameters are given
+        all_parameters_given([first_name, surname, class_name])
+
+        # make sure the given url works
+        url_exists(url)
 
         class_name = classes_display_add.get(class_name[0])
         insert_student(first_name, surname, class_name[0], url)
@@ -91,8 +96,8 @@ def main():
         erase([name_entry, surname_entry, url_entry])
 
     def add_class(class_name: str, classes_listbox: Listbox) -> str:
-        if not class_name:
-            return messagebox.showerror("Error", "Please provide a name for a new class!")
+        # make sure all parameters were given
+        all_parameters_given([class_name])
 
         exists = insert_class(class_name)
         if exists:
@@ -108,11 +113,8 @@ def main():
         classes_listbox.config(state=DISABLED)  # going back to an initial state
 
     def update_given_class(old_class_name: tuple, new_class_name: str) -> str:
-        if not old_class_name:
-            return messagebox.showerror("Error", "Please choose a class!")
-
-        if not new_class_name:
-            return messagebox.showerror("Error", "Please provide a name for updated class!")
+        # make sure all parameters were given
+        all_parameters_given([old_class_name, new_class_name])
 
         old_class_name = classes_display_add.get(old_class_name)
         exists = update_class_name(old_class_name[0], new_class_name)
