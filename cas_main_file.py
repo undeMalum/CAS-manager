@@ -56,14 +56,7 @@ def main():
     def change_state(widgets_with_state: list[(ttk.Widget, int)]) -> None:
         widget = 0
         state_of_widget = 1
-        state_disable, state_normal = DISABLED, NORMAL
-        for widget_with_state in widgets_with_state:
-            # it is assumed that disabled is indicated with 0 and normal with 1
-            if widget_with_state[state_of_widget] == 0:
-                state = state_disable
-            else:
-                state = state_normal
-            widget_with_state[widget].configure(state=state)
+        [widget_state[widget].config(state=widget_state[state_of_widget]) for widget_state in widgets_with_state]
 
     def accept_class(students_listbox: 'Listbox', classes_listbox: 'Listbox') -> None:
         students_listbox.delete(0, END)
@@ -414,29 +407,29 @@ def main():
 
     # this dictionary contains prepared sets of objects to be used by RadioButtons
     changing_state_dict = {
-        "update_class": [(name_entry, 0),
-                         (surname_entry, 0),
-                         (url_entry, 0),
-                         (updated_added_name, 1),
-                         (classes_display_add, 1)
+        "update_class": [(name_entry, DISABLED),
+                         (surname_entry, DISABLED),
+                         (url_entry, DISABLED),
+                         (updated_added_name, NORMAL),
+                         (classes_display_add, NORMAL)
                          ],
-        "new_class": [(name_entry, 0),
-                      (surname_entry, 0),
-                      (url_entry, 0),
-                      (updated_added_name, 1),
-                      (classes_display_add, 0)
+        "new_class": [(name_entry, DISABLED),
+                      (surname_entry, DISABLED),
+                      (url_entry, DISABLED),
+                      (updated_added_name, NORMAL),
+                      (classes_display_add, DISABLED)
                       ],
-        "new_student": [(name_entry, 1),
-                        (surname_entry, 1),
-                        (url_entry, 1),
-                        (updated_added_name, 0),
-                        (classes_display_add, 1)
+        "new_student": [(name_entry, NORMAL),
+                        (surname_entry, NORMAL),
+                        (url_entry, NORMAL),
+                        (updated_added_name, DISABLED),
+                        (classes_display_add, NORMAL)
                         ],
-        "remove_class": [(students_display_rem, 0),
-                         (class_chosen_rem, 0)
+        "remove_class": [(students_display_rem, DISABLED),
+                         (class_chosen_rem, DISABLED)
                          ],
-        "remove_student": [(students_display_rem, 1),
-                           (class_chosen_rem, 1)
+        "remove_student": [(students_display_rem, NORMAL),
+                           (class_chosen_rem, NORMAL)
                            ]
     }
 
