@@ -64,64 +64,73 @@ def main():
         if not chosen_class:
             messagebox.showerror("Error", "Please choose a class!")
         else:
-            chosen_class = classes_listbox.get(chosen_class)
+            chosen_class = classes_listbox.get(chosen_class)  # convert indices into actual values
             fetch_students(students_listbox, chosen_class[0])
             global store_class_name
             store_class_name = chosen_class
 
-    def add_student(first_name: str, surname: str, class_name: tuple, url: str) -> None:
+    def add_student(first_name: str, surname: str, class_name: tuple, url: str) -> str:
         if not class_name:
-            messagebox.showerror("Error", "Please choose a class!")
-        elif first_name == "" or surname == "" or url == "":
-            messagebox.showerror("Error", "Please fill all gaps!")
-        else:
-            try:
-                get(url)
-            except exceptions.RequestException:
-                messagebox.showerror("Error", "Given website does not exist!")
-            else:
-                class_name = classes_display_add.get(class_name[0])
-                insert_student(first_name, surname, class_name[0], url)
-                # displaying information about adding student (temporarily)
-                updated_added_label.config(text="Added successfully!")
-                updated_added_label.after(3000, lambda: updated_added_label.config(text="(Updated/added class name)"))
-                # erasing entry boxes so the user doesn't have to do it by himself
-                erase([name_entry, surname_entry, url_entry])
+            return messagebox.showerror("Error", "Please choose a class!")
 
-    def add_class(class_name: str, classes_listbox: Listbox) -> None:
-        if class_name == "":
-            messagebox.showerror("Error", "Please provide a name for a new class!")
-        else:
-            exists = insert_class(class_name)
-            if exists:
-                messagebox.showerror("Error", "Given class already exists!")
-            else:
-                # displaying information about adding class (temporarily)
-                updated_added_label.config(text="Added successfully!")
-                updated_added_label.after(3000, lambda: updated_added_label.config(text="(Updated/added class name)"))
-                # displaying newly added class
-                classes_listbox.config(state=NORMAL)  # changing state of listbox to make changes
-                erase([classes_display_add, updated_added_name])
-                fetch_classes(classes_display_add)
-                classes_listbox.config(state=DISABLED)  # going back to an initial state
+        if not first_name or not surname or not url:
+            return messagebox.showerror("Error", "Please fill all gaps!")
 
-    def update_given_class(old_class_name: tuple, new_class_name: str) -> None:
+        # check whether the given url exists
+        try:
+            get(url)
+        except exceptions.RequestException:
+            return messagebox.showerror("Error", "Given website does not exist!")
+
+        class_name = classes_display_add.get(class_name[0])
+        insert_student(first_name, surname, class_name[0], url)
+        # displaying information about adding student (temporarily)
+        updated_added_label.config(text="Added successfully!")
+        updated_added_label.after(3000, lambda: updated_added_label.config(text="(Updated/added class name)"))
+        # erasing entry boxes so the user doesn't have to do it by himself
+        erase([name_entry, surname_entry, url_entry])
+
+    def add_class(class_name: str, classes_listbox: Listbox) -> str:
+        if not class_name:
+            return messagebox.showerror("Error", "Please provide a name for a new class!")
+
+        exists = insert_class(class_name)
+        if exists:
+            return messagebox.showerror("Error", "Given class already exists!")
+
+        # displaying information about adding class (temporarily)
+        updated_added_label.config(text="Added successfully!")
+        updated_added_label.after(3000, lambda: updated_added_label.config(text="(Updated/added class name)"))
+        # displaying newly added class
+        classes_listbox.config(state=NORMAL)  # changing state of listbox to make changes
+        erase([classes_display_add, updated_added_name])
+        fetch_classes(classes_display_add)
+        classes_listbox.config(state=DISABLED)  # going back to an initial state
+
+    def update_given_class(old_class_name: tuple, new_class_name: str) -> str:
         if not old_class_name:
-            messagebox.showerror("Error", "Please choose a class!")
-        elif new_class_name == "":
-            messagebox.showerror("Error", "Please provide a name for updated class!")
-        else:
-            old_class_name = classes_display_add.get(old_class_name)
-            exists = update_class_name(old_class_name[0], new_class_name)
-            if exists:
-                messagebox.showerror("Error", "Given class already exists! Delete or change already existing class.")
-            else:
-                # displaying information about updating class (temporarily)
-                updated_added_label.config(text="Updated successfully!")
-                updated_added_label.after(3000, lambda: updated_added_label.config(text="(Updated/added class name)"))
-                # displaying changes
-                fetch_classes(classes_display_add)
-                erase([updated_added_name])
+            return messagebox.showerror("Error", "Please choose a class!")
+
+        if not new_class_name:
+            return messagebox.showerror("Error", "Please provide a name for updated class!")
+
+        old_class_name = classes_display_add.get(old_class_name)
+        exists = update_class_name(old_class_name[0], new_class_name)
+        if exists:
+            return messagebox.showerror("Error", "Given class already exists! Delete or change already existing class.")
+
+        # displaying information about updating class (temporarily)
+        updated_added_label.config(text="Updated successfully!")
+        updated_added_label.after(3000, lambda: updated_added_label.config(text="(Updated/added class name)"))
+        # displaying changes
+        fetch_classes(classes_display_add)
+        erase([updated_added_name])
+
+    add_frame_store_function_mode = {
+        1: update_given_class,
+        2: add_class,
+        3: add_student
+    }
 
     def chosen_mode_add(mode: int, class_name: str, classes_listbox: Listbox) -> None:
         if mode == 1:

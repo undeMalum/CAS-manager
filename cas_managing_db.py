@@ -1,5 +1,5 @@
 import sqlite3
-from tkinter import END, Listbox, DISABLED, NORMAL
+from tkinter import END, Listbox, NORMAL
 
 # creating database with 2 table; classes and students
 conn = sqlite3.connect("cas_db.db")
@@ -104,38 +104,49 @@ def insert_student(first_name: str, surname: str, chosen_class: str, url: str) -
     c.close()
 
 
+def exists_in_db(prompt: str, column: str, value: str) -> bool:
+    c = sqlite3.connect("cas_db.db")
+    cur = c.cursor()
+
+    cur.execute(prompt, {column: value})
+    fetched_value = cur.fetchone()
+    c.close()
+
+    if fetched_value is None:
+        return False
+
+    return True
+
+
 def insert_class(class_name: str) -> bool:
     c = sqlite3.connect("cas_db.db")
     cur = c.cursor()
+
     prompt1 = "select class_name from classes where class_name = (:class_name)"
-    cur.execute(prompt1, {"class_name": class_name})
-    got_class_name = cur.fetchone()
-    exists = False
-    if got_class_name is not None:
-        exists = True
-    else:
-        prompt2 = "insert into classes(class_name) values (:class_name)"
-        cur.execute(prompt2, {"class_name": class_name})
-        c.commit()
+    if exists_in_db(prompt1, "class_name", class_name) is True:
+        c.close()
+        return True
+
+    # if class of given name wasn't given
+    prompt2 = "insert into classes(class_name) values (:class_name)"
+    cur.execute(prompt2, {"class_name": class_name})
+    c.commit()
     c.close()
-    return exists
 
 
 def update_class_name(old_class_name: str, new_class_name: str) -> bool:
     c = sqlite3.connect("cas_db.db")
     cur = c.cursor()
+
     prompt1 = "select class_name from classes where class_name = (:class_name)"
-    cur.execute(prompt1, {"class_name": new_class_name})
-    got_class_name = cur.fetchone()
-    exists = False
-    if got_class_name is not None:
-        exists = True
-    else:
-        prompt2 = "update classes set class_name = (:new_class_name) where class_name = (:old_class_name)"
-        cur.execute(prompt2, {"new_class_name": new_class_name, "old_class_name": old_class_name})
-        c.commit()
+    if exists_in_db(prompt1, "class_name", new_class_name) is True:
+        c.close()
+        return True
+
+    prompt2 = "update classes set class_name = (:new_class_name) where class_name = (:old_class_name)"
+    cur.execute(prompt2, {"new_class_name": new_class_name, "old_class_name": old_class_name})
+    c.commit()
     c.close()
-    return exists
 
 
 def delete_students(students_to_be_deleted: list, their_class: str) -> None:
