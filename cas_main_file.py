@@ -69,6 +69,10 @@ def main():
             global store_class_name
             store_class_name = chosen_class
 
+    def show_info(widget, pop_up_text: str, static_text: str) -> None:
+        widget.config(text=pop_up_text)
+        widget.after(3000, lambda: widget.config(text=static_text))
+
     def all_parameters_given(widgets: list) -> str:
         for widget in widgets:
             if not widget:
@@ -80,9 +84,9 @@ def main():
         except exceptions.RequestException:
             return messagebox.showerror("Error", "Given website does not exist!")
 
-    def add_student(first_name: str, surname: str, class_name: tuple, url: str) -> None:
+    def add_student(info_label: Label, class_name: tuple, first_name: str, surname: str, url: str) -> None:
         # make sure all parameters are given
-        all_parameters_given([first_name, surname, class_name])
+        all_parameters_given([class_name, first_name, surname])
 
         # make sure the given url works
         url_exists(url)
@@ -90,12 +94,12 @@ def main():
         class_name = classes_display_add.get(class_name[0])
         insert_student(first_name, surname, class_name[0], url)
         # displaying information about adding student (temporarily)
-        updated_added_label.config(text="Added successfully!")
-        updated_added_label.after(3000, lambda: updated_added_label.config(text="(Updated/added class name)"))
+        show_info(info_label, "Added successfully!", "(Updated/added class name)")
+
         # erasing entry boxes so the user doesn't have to do it by himself
         erase([name_entry, surname_entry, url_entry])
 
-    def add_class(class_name: str, classes_listbox: Listbox) -> str:
+    def add_class(info_label: Label, class_name: str, classes_listbox: Listbox) -> str:
         # make sure all parameters were given
         all_parameters_given([class_name])
 
@@ -104,28 +108,30 @@ def main():
             return messagebox.showerror("Error", "Given class already exists!")
 
         # displaying information about adding class (temporarily)
-        updated_added_label.config(text="Added successfully!")
-        updated_added_label.after(3000, lambda: updated_added_label.config(text="(Updated/added class name)"))
+        show_info(info_label, "Added successfully!", "(Updated/added class name)")
+
         # displaying newly added class
         classes_listbox.config(state=NORMAL)  # changing state of listbox to make changes
         erase([classes_display_add, updated_added_name])
         fetch_classes(classes_display_add)
         classes_listbox.config(state=DISABLED)  # going back to an initial state
 
-    def update_given_class(old_class_name: tuple, new_class_name: str) -> str:
+    def update_given_class(info_label: Label, new_class_name: str, add_listbox: Listbox) -> str:
+        old_class_name = add_listbox.curselection()  # get indices from the listbox
+
         # make sure all parameters were given
         all_parameters_given([old_class_name, new_class_name])
 
-        old_class_name = classes_display_add.get(old_class_name)
+        old_class_name = old_class_name.get(old_class_name)
         exists = update_class_name(old_class_name[0], new_class_name)
         if exists:
             return messagebox.showerror("Error", "Given class already exists! Delete or change already existing class.")
 
         # displaying information about updating class (temporarily)
-        updated_added_label.config(text="Updated successfully!")
-        updated_added_label.after(3000, lambda: updated_added_label.config(text="(Updated/added class name)"))
+        show_info(info_label, "Updated successfully!", "(Updated/added class name)")
+
         # displaying changes
-        fetch_classes(classes_display_add)
+        fetch_classes(add_listbox)
         erase([updated_added_name])
 
     add_frame_store_function_mode = {
@@ -134,13 +140,13 @@ def main():
         3: add_student
     }
 
-    def chosen_mode_add(mode: int, class_name: str, classes_listbox: Listbox) -> None:
+    def chosen_mode_add(mode: int, info_label: Label, given_class_name: str, classes_listbox: Listbox) -> None:
         if mode == 1:
-            update_given_class(classes_listbox.curselection(), class_name)
+            update_given_class(info_label, given_class_name, classes_listbox.curselection())
         elif mode == 3:
-            add_class(class_name, classes_listbox)
+            add_class(info_label, given_class_name, classes_listbox)
         else:
-            add_student(name_entry.get(), surname_entry.get(), classes_listbox.curselection(), url_entry.get())
+            add_student(info_label, classes_listbox, name_entry.get(), surname_entry.get(), url_entry.get())
 
     def call_delete_students(students_to_be_deleted: tuple, their_class: str) -> None:
         if their_class == "":
@@ -411,6 +417,7 @@ def main():
         text="Add",
         command=lambda: chosen_mode_add(
             add_mode.get(),
+            updated_added_label,
             updated_added_name.get(),
             classes_display_add
         )
