@@ -84,15 +84,17 @@ def main():
         except exceptions.RequestException:
             return messagebox.showerror("Error", "Given website does not exist!")
 
-    def add_student(info_label: Label, class_name: tuple, first_name: str, surname: str, url: str) -> None:
+    def add_student(info_label: Label, add_listbox: Listbox, first_name: str, surname: str, url: str) -> None:
+        class_name_idxs = add_listbox.curselection()
+
         # make sure all parameters are given
-        all_parameters_given([class_name, first_name, surname])
+        all_parameters_given([class_name_idxs, first_name, surname])
 
         # make sure the given url works
         url_exists(url)
 
-        class_name = classes_display_add.get(class_name[0])
-        insert_student(first_name, surname, class_name[0], url)
+        class_name_values = class_name_idxs.get(class_name_idxs[0])
+        insert_student(first_name, surname, class_name_values[0], url)
         # displaying information about adding student (temporarily)
         show_info(info_label, "Added successfully!", "(Updated/added class name)")
 
@@ -117,13 +119,13 @@ def main():
         classes_listbox.config(state=DISABLED)  # going back to an initial state
 
     def update_given_class(info_label: Label, new_class_name: str, add_listbox: Listbox) -> str:
-        old_class_name = add_listbox.curselection()  # get indices from the listbox
+        old_class_name_idxs = add_listbox.curselection()  # get indices from the listbox
 
         # make sure all parameters were given
-        all_parameters_given([old_class_name, new_class_name])
+        all_parameters_given([old_class_name_idxs, new_class_name])
 
-        old_class_name = old_class_name.get(old_class_name)
-        exists = update_class_name(old_class_name[0], new_class_name)
+        old_class_name_values = old_class_name_idxs.get(old_class_name_idxs)
+        exists = update_class_name(old_class_name_values[0], new_class_name)
         if exists:
             return messagebox.showerror("Error", "Given class already exists! Delete or change already existing class.")
 
@@ -142,11 +144,12 @@ def main():
 
     def chosen_mode_add(mode: int, info_label: Label, given_class_name: str, classes_listbox: Listbox) -> None:
         if mode == 1:
-            update_given_class(info_label, given_class_name, classes_listbox.curselection())
-        elif mode == 3:
-            add_class(info_label, given_class_name, classes_listbox)
+            update_given_class(info_label, given_class_name, classes_listbox)
+        elif mode == 2:
+            add_student(info_label, classes_listbox, name_entry.get(), surname_entry.get(),
+                        url_entry.get())
         else:
-            add_student(info_label, classes_listbox, name_entry.get(), surname_entry.get(), url_entry.get())
+            add_class(info_label, given_class_name, classes_listbox)
 
     def call_delete_students(students_to_be_deleted: tuple, their_class: str) -> None:
         if their_class == "":
