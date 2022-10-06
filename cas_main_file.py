@@ -85,6 +85,7 @@ def main():
             return messagebox.showerror("Error", "Given website does not exist!")
 
     def add_student(info_label: Label, add_listbox: Listbox, first_name: str, surname: str, url: str) -> None:
+        # get all indices from the chosen range
         class_name_idxs = add_listbox.curselection()
 
         # make sure all parameters are given
@@ -93,7 +94,7 @@ def main():
         # make sure the given url works
         url_exists(url)
 
-        class_name_values = class_name_idxs.get(class_name_idxs[0])
+        class_name_values = add_listbox.get(class_name_idxs[0])
         insert_student(first_name, surname, class_name_values[0], url)
         # displaying information about adding student (temporarily)
         show_info(info_label, "Added successfully!", "(Updated/added class name)")
@@ -119,12 +120,13 @@ def main():
         classes_listbox.config(state=DISABLED)  # going back to an initial state
 
     def update_given_class(info_label: Label, new_class_name: str, add_listbox: Listbox) -> str:
-        old_class_name_idxs = add_listbox.curselection()  # get indices from the listbox
+        # get all indices from the chosen range
+        old_class_name_idxs = add_listbox.curselection()
 
         # make sure all parameters were given
         all_parameters_given([old_class_name_idxs, new_class_name])
 
-        old_class_name_values = old_class_name_idxs.get(old_class_name_idxs)
+        old_class_name_values = add_listbox.get(old_class_name_idxs)
         exists = update_class_name(old_class_name_values[0], new_class_name)
         if exists:
             return messagebox.showerror("Error", "Given class already exists! Delete or change already existing class.")
