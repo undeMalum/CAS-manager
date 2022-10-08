@@ -73,26 +73,30 @@ def main():
         widget.config(text=pop_up_text)
         widget.after(3000, lambda: widget.config(text=static_text))
 
-    def all_parameters_given(widgets: list) -> str:
+    def all_parameters_given(widgets: list) -> bool:
         for widget in widgets:
             if not widget:
-                return messagebox.showerror("Error", "Please fill all gaps!")
+                return False
+        return True
 
-    def url_exists(url: str) -> str:
+    def url_exists(url: str) -> bool:
         try:
             get(url)
         except exceptions.RequestException:
-            return messagebox.showerror("Error", "Given website does not exist!")
+            return False
+        return True
 
-    def add_student(info_label: Label, add_listbox: Listbox, first_name: str, surname: str, url: str) -> None:
+    def add_student(info_label: Label, add_listbox: Listbox, first_name: str, surname: str, url: str) -> str:
         # get all indices from the chosen range
         class_name_idxs = add_listbox.curselection()
 
         # make sure all parameters are given
-        all_parameters_given([class_name_idxs, first_name, surname])
+        if not all_parameters_given([class_name_idxs, first_name, surname]):
+            return messagebox.showerror("Error", "Please fill all gaps!")
 
         # make sure the given url works
-        url_exists(url)
+        if not url_exists(url):
+            return messagebox.showerror("Error", "Given website does not exist!")
 
         class_name_values = add_listbox.get(class_name_idxs[0])
         insert_student(first_name, surname, class_name_values[0], url)
@@ -104,7 +108,8 @@ def main():
 
     def add_class(info_label: Label, class_name: str, classes_listbox: Listbox) -> str:
         # make sure all parameters were given
-        all_parameters_given([class_name])
+        if not all_parameters_given([class_name]):
+            return messagebox.showerror("Error", "Please fill all gaps!")
 
         exists = insert_class(class_name)
         if exists:
@@ -124,7 +129,8 @@ def main():
         old_class_name_idxs = add_listbox.curselection()
 
         # make sure all parameters were given
-        all_parameters_given([old_class_name_idxs, new_class_name])
+        if not all_parameters_given([old_class_name_idxs, new_class_name]):
+            messagebox.showerror("Error", "Please fill all gaps!")
 
         old_class_name_values = add_listbox.get(old_class_name_idxs)
         exists = update_class_name(old_class_name_values[0], new_class_name)

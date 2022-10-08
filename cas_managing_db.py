@@ -1,5 +1,7 @@
 import sqlite3
-from tkinter import END, Listbox, NORMAL, messagebox
+from tkinter import END, Listbox, NORMAL
+from abc import ABC, abstractmethod
+from enum import Enum, auto
 
 # creating database with 2 table; classes and students
 conn = sqlite3.connect("cas_db.db")
@@ -106,15 +108,15 @@ class AddUpdate:
         "insert_student": "insert into students values (:first_name, :surname, :class_id, :url);"
     }
 
-    def __int__(self):
-        self.c = sqlite3.connect("cas_db.db")
-        self.cur = self.c.cursor()
+    def __init__(self, db: str):
+        self.c = sqlite3.connect(db)
 
     # functions that are used either to check something or as an intermediate
     def exists_in_db(self, column: str, value: str) -> bool:
+        cur = self.c.cursor()
         prompt = self.prompts["test_existence"]
-        self.cur.execute(prompt, {column: value})
-        fetched_value = self.cur.fetchone()
+        cur.execute(prompt, {column: value})
+        fetched_value = cur.fetchone()
 
         if fetched_value is None:
             return False
@@ -123,38 +125,42 @@ class AddUpdate:
 
     # probably to be moved to another class
     def fetch_class(self, class_name: str) -> int:
+        cur = self.c.cursor()
         prompt = self.prompts["retrieve_id"]
-        self.cur.execute(prompt, {"class_name": class_name})
-        class_id = self.cur.fetchone()[0]
+        cur.execute(prompt, {"class_name": class_name})
+        class_id = cur.fetchone()[0]
         return class_id
 
     # altering database
     def insert_class(self, class_name: str) -> bool:
-        if self.exists_in_db("class_name", class_name) is True:
+        cur = self.c.cursor()
+        if self.exists_in_db("class_name", class_name):
             self.c.close()
             return True
 
         # if given class doesn't exist: insert
         prompt = self.prompts["insert_class"]
-        self.cur.execute(prompt, {"class_name": class_name})
+        cur.execute(prompt, {"class_name": class_name})
         self.c.commit()
         self.c.close()
 
     def update_class_name(self, old_class_name: str, new_class_name: str) -> bool:
-        if self.exists_in_db("class_name", new_class_name) is True:
+        cur = self.c.cursor()
+        if self.exists_in_db("class_name", new_class_name):
             self.c.close()
             return True
 
         # if given class doesn't exist: update
         prompt = self.prompts["update_class"]
-        self.cur.execute(prompt, {"new_class_name": new_class_name, "old_class_name": old_class_name})
+        cur.execute(prompt, {"new_class_name": new_class_name, "old_class_name": old_class_name})
         self.c.commit()
         self.c.close()
 
     def insert_student(self, first_name: str, surname: str, chosen_class: str, url: str) -> None:
+        cur = self.c.cursor()
         class_id = fetch_class(chosen_class)
         prompt = self.prompts["insert_student"]
-        self.cur.execute(prompt, {"first_name": first_name, "surname": surname, "class_id": class_id, "url": url})
+        cur.execute(prompt, {"first_name": first_name, "surname": surname, "class_id": class_id, "url": url})
         self.c.commit()
         self.c.close()
 
