@@ -23,7 +23,7 @@ class AlterDB(ABC):
     """This class defines how classes altering db should look like."""
 
     prompts = {
-        "teste_existence": "select class_name from classes where class_name = (:class_name);",
+        "test_existence": "select class_name from classes where class_name = (:class_name);",
         "retrieve_id": "select class_id from classes where class_name = (:class_name);",
         "insert_class": "insert into classes(class_name) values (:class_name);",
         "update_class": "select class_name from classes where class_name = (:class_name);",
@@ -52,9 +52,15 @@ class AlterDB(ABC):
         class_id = self.cur.fetchone()[0]
         return class_id
 
-    # function that alter db
+    # ensures data is provided in the subclass's initializer and is correct
+    # implementation however depends on the particular case
     @abstractmethod
-    def insert(self):
+    def data_is_correct(self) -> bool:
+        pass
+
+    # function that alters db
+    @abstractmethod
+    def insert(self) -> None:
         pass
 
 
@@ -75,16 +81,28 @@ class NewStudent(AlterDB):
                  first_name: StudentData.FIRST_NAME, surname: StudentData.SURNAME,
                  url: StudentData.URL, class_name: StudentData.CLASS_NAME):
         super().__init__()
-        self.first_name = first_name
-        self.surname = surname
-        self.url = url
-        self.class_name = class_name
+        self.__first_name = first_name
+        self.__surname = surname
+        self.__url = url
+        self.__class_name = class_name
+
+    def data_is_correct(self) -> bool:
+        if not all_parameters_given([
+                self.__first_name, self.__surname,
+                self.__url, self.__class_name
+                ]):
+            return False
+
+        if not url_exists(self.__url):
+            return False
+
+        return True
 
     def insert(self) -> None:
-        class_id = self.fetch_class_id(self.class_name)
+        class_id = self.fetch_class_id(self.__class_name)
         prompt = self.prompts["insert_student"]
         self.cur.execute(prompt, {
-            "first_name": self.first_name, "surname": self.surname,
-            "url": self.url, "class_id": class_id})
+            "first_name": self.__first_name, "surname": self.__surname,
+            "url": self.__url, "class_id": class_id})
         self.c.commit()
         self.c.close()
