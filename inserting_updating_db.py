@@ -1,6 +1,5 @@
 from requests import get, exceptions
 from abc import ABC, abstractmethod
-from enum import Enum, auto
 import sqlite3
 
 
@@ -64,22 +63,12 @@ class AlterDB(ABC):
         pass
 
 
-class StudentData(Enum):
-    """This class stores enum of a student's data to specify
-    the order in which values in the list should be provided."""
-
-    FIRST_NAME = auto()
-    SURNAME = auto()
-    URL = auto()
-    CLASS_NAME = auto()
-
-
 class NewStudent(AlterDB):
     """This class manages creating a student record."""
 
     def __init__(self,
-                 first_name: StudentData.FIRST_NAME, surname: StudentData.SURNAME,
-                 url: StudentData.URL, class_name: StudentData.CLASS_NAME):
+                 first_name: str, surname: str,
+                 url: str, class_name: str):
         super().__init__()
         self.__first_name = first_name
         self.__surname = surname
