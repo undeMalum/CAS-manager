@@ -35,7 +35,7 @@ class AlterDB(ABC):
         self.cur = self.c.cursor()
 
     # functions that are either an intermediate steps or parameters checking
-    def exists_in_db(self, column: str, value: str) -> bool:
+    def exists_in_db(self, value: str, column: str = "class_name") -> bool:
         prompt = self.prompts["test_existence"]
         self.cur.execute(prompt, {column: value})
         fetched_value = self.cur.fetchone()
@@ -59,7 +59,7 @@ class AlterDB(ABC):
 
     # function that alters db
     @abstractmethod
-    def insert(self) -> None:
+    def alter(self) -> None:
         pass
 
 
@@ -87,11 +87,61 @@ class NewStudent(AlterDB):
 
         return True
 
-    def insert(self) -> None:
+    # altering database: inserting students
+    def alter(self) -> None:
         class_id = self.fetch_class_id(self.__class_name)
         prompt = self.prompts["insert_student"]
         self.cur.execute(prompt, {
             "first_name": self.__first_name, "surname": self.__surname,
             "url": self.__url, "class_id": class_id})
+        self.c.commit()
+        self.c.close()
+
+
+class NewClass(AlterDB):
+    """This class manages creating a class record."""
+
+    def __init__(self, class_name: str):
+        super().__init__()
+        self.__class_name = class_name
+
+    def data_is_correct(self) -> bool:
+        if not all_parameters_given([self.__class_name]):
+            return False
+
+        return True
+
+    # altering database: inserting classes
+    def alter(self) -> None:
+        prompt = self.prompts["insert_class"]
+        self.cur.execute(prompt, {"class_name": self.__class_name})
+        self.c.commit()
+        self.c.close()
+
+
+class UpdateClass(AlterDB):
+    """This class manages changing a class record."""
+
+    def __init__(self, old_class_name: str, new_class_name: str):
+        super().__init__()
+        self.__old_class_name = old_class_name
+        self.__new_class_name = new_class_name
+
+    def data_is_correct(self) -> bool:
+        if not all_parameters_given([self.__old_class_name, self.__new_class_name]):
+            return False
+
+        return True
+
+    # altering database: updating classes
+    def alter(self) -> bool:
+        cur = self.c.cursor()
+        if self.exists_in_db("class_name", self.__new_class_name):
+            self.c.close()
+            return True
+
+        # if given class doesn't exist: update
+        prompt = self.prompts["update_class"]
+        cur.execute(prompt, {"new_class_name": self.__new_class_name, "old_class_name": self.__old_class_name})
         self.c.commit()
         self.c.close()
