@@ -41,9 +41,12 @@ class AlterDB(ABC):
     def close_db(self):
         self.c.close()
 
+    def commit(self):
+        self.c.commit()
+
     # static methods
     @staticmethod
-    def all_parameters_given(widgets: list) -> bool:
+    def all_parameters_given(widgets: list[str]) -> bool:
         for widget in widgets:
             if not widget:
                 return False

@@ -32,7 +32,6 @@ class NewStudent(AlterDB):
         self.cur.execute(prompt, {
             "first_name": self.__first_name, "surname": self.__surname,
             "url": self.__url, "class_id": class_id})
-        self.c.commit()
 
 
 class NewClass(AlterDB):
@@ -52,7 +51,6 @@ class NewClass(AlterDB):
     def alter(self) -> None:
         prompt = self.prompts["insert_class"]
         self.cur.execute(prompt, {"class_name": self.__class_name})
-        self.c.commit()
 
 
 class UpdateClass(AlterDB):
@@ -79,4 +77,3 @@ class UpdateClass(AlterDB):
         # if given class doesn't exist: update
         prompt = self.prompts["update_class"]
         cur.execute(prompt, {"new_class_name": self.__new_class_name, "old_class_name": self.__old_class_name})
-        self.c.commit()
