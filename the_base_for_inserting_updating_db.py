@@ -32,7 +32,7 @@ class AlterDB(ABC):
 
         return True
 
-    def fetch_class_id(self, class_name: str) -> int:
+    def fetch_class_id(self, class_name: tuple[str]) -> int:
         prompt = self.prompts["retrieve_id"]
         self.cur.execute(prompt, {"class_name": class_name})
         class_id = self.cur.fetchone()[0]

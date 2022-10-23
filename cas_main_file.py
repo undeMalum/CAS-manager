@@ -130,7 +130,7 @@ def main():
 
         # make sure all parameters were given
         if not all_parameters_given([old_class_name_idxs, new_class_name]):
-           return messagebox.showerror("Error", "Please fill all gaps!")
+            return messagebox.showerror("Error", "Please fill all gaps!")
 
         old_class_name_values = add_listbox.get(old_class_name_idxs)
         exists = update_class_name(old_class_name_values[0], new_class_name)

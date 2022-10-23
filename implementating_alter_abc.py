@@ -1,4 +1,4 @@
-from inserting_updating_db import AlterDB
+from the_base_for_inserting_updating_db import AlterDB
 
 
 class NewStudent(AlterDB):
@@ -6,7 +6,7 @@ class NewStudent(AlterDB):
 
     def __init__(self,
                  first_name: str, surname: str,
-                 url: str, class_name: str):
+                 url: str, class_name: tuple[str]):
         super().__init__()
         self.__first_name = first_name
         self.__surname = surname
