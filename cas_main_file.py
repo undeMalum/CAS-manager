@@ -153,7 +153,7 @@ def main():
     def chosen_mode_add(mode: int, info_label: Label, given_class_name: str, classes_listbox: Listbox) -> None:
         if mode == 1:
             update_given_class(info_label, given_class_name, classes_listbox)
-        elif mode == 2:
+        elif mode == 3:
             add_student(info_label, classes_listbox, name_entry.get(), surname_entry.get(),
                         url_entry.get())
         else:
@@ -369,7 +369,7 @@ def main():
 
     # creating widgets inside add frame
     # three 'modes' of this frame
-    add_mode = IntVar(add_frame, 2)
+    add_mode = IntVar(add_frame, 3)
     update_class = Radiobutton(
         add_frame, 
         text="Update class", 
@@ -382,7 +382,7 @@ def main():
     new_class = Radiobutton(
         add_frame,
         text="New class",
-        value=3,
+        value=2,
         variable=add_mode,
         command=lambda: change_state(
             changing_state_dict["new_class"]
@@ -391,7 +391,7 @@ def main():
     new_student = Radiobutton(
         add_frame,
         text="New student",
-        value=2,
+        value=3,
         variable=add_mode,
         command=lambda: change_state(
             changing_state_dict["new_student"]
