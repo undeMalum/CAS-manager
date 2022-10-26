@@ -2,7 +2,7 @@ import implementing_alter_abc as imp
 
 from tkinter import ttk, messagebox, END
 import tkinter as tk
-from typing import Union
+from typing import Union, Callable
 from enum import Enum, auto
 
 
@@ -32,84 +32,80 @@ def erase(widgets: list) -> None:
 #     erase([name_entry, surname_entry, url_entry])
 
 
-def alter_db(object_to_alter_db: Union[imp.NewStudent, imp.NewClass, imp.UpdateClass]) -> None:
-    object_to_alter_db.alter()
-    object_to_alter_db.commit()
-    object_to_alter_db.close_db()
-
-
 class AddMode(Enum):
     UPDATE_CLASS = auto()
     NEW_CLASS = auto()
     NEW_STUDENT = auto()
 
 
-def manage_updating_class_record(old_class_name: tuple[str], new_class_name: str) -> str:
-    updated_class = imp.UpdateClass(old_class_name, new_class_name)
+def alter_db(object_to_alter_db: Union[imp.NewStudent, imp.NewClass, imp.UpdateClass]) -> None:
+    object_to_alter_db.alter()
+    object_to_alter_db.commit()
+    object_to_alter_db.close_db()
 
-    if not updated_class.data_is_correct:
+
+def class_given(class_listbox: tk.Listbox) -> str:
+    if not class_listbox.curselection():
+        return tk.messagebox.showerror("Error", "No class given!")
+
+
+def create_update_class(old_class_name: tuple[str], new_class_name: str) -> imp.UpdateClass:
+    return imp.UpdateClass(old_class_name, new_class_name)
+
+
+def create_insert_class(class_name: str) -> imp.NewClass:
+    return imp.NewClass(class_name)
+
+
+def create_insert_student(first_name: str, surname: str,
+                          url: str, class_name: tuple[str]) -> imp.NewStudent:
+    return imp.NewStudent(first_name, surname, url, class_name)
+
+
+def db_alteration(object_altering_db: Union[imp.UpdateClass, imp.NewClass, imp.NewStudent], alter_class: bool):
+    if not object_altering_db.data_is_correct:
         return tk.messagebox.showerror("Error", "Provided data is incorrect!")
 
-    if updated_class.exists_in_db:
-        return tk.messagebox.showerror("Error", "Class of given name already exists!")
-
-    # updating class record
-    alter_db(updated_class)
-
-    return tk.messagebox.showinfo("Completed!", "Class updated successfully!")
-
-
-def manage_inserting_class(class_name: str) -> str:
-    inserted_class = imp.NewClass(class_name)
-
-    if not inserted_class.data_is_correct:
-        return tk.messagebox.showerror("Error", "Provided data is incorrect!")
-
-    if inserted_class.exists_in_db:
-        return tk.messagebox.showerror("Error", "Class of given name already exists!")
+    if alter_class:
+        if object_altering_db.exists_in_db:
+            return tk.messagebox.showerror("Error", "Class of given name already exists!")
 
     # inserting class into db
-    alter_db(inserted_class)
+    alter_db(object_altering_db)
 
-    return tk.messagebox.showinfo("Completed!", "Class added successfully!")
-
-
-def manage_inserting_student(first_name: str, surname: str,
-                             url: str, class_name: tuple[str]) -> str:
-    inserted_student = imp.NewStudent(first_name, surname, url, class_name)
-
-    if not inserted_student.data_is_correct:
-        return tk.messagebox.showerror("Error", "Provided data is incorrect!")
-
-    # inserting student into db
-    alter_db(inserted_student)
-
-    return tk.messagebox.showinfo("Completed!", "Student added successfully!")
+    return tk.messagebox.showinfo("Completed!", "Operation completed successfully!")
 
 
 def choose_mode_add(mode: AddMode, class_listbox: tk.Listbox,
                     class_name_entry: ttk.Entry, first_name_entry: ttk.Entry,
-                    surname_entry: ttk.Entry, url_entry: ttk.Entry) -> str:
-    if mode == AddMode.UPDATE_CLASS:
-        if not class_listbox.curselection():
-            return tk.messagebox.showerror("Error", "No class given!")
+                    surname_entry: ttk.Entry, url_entry: ttk.Entry) -> None:
 
-        old_class_name = class_listbox.get(class_listbox.curselection())
-        new_class_name = class_name_entry.get()
-        manage_updating_class_record(old_class_name, new_class_name)
-    elif mode == AddMode.NEW_CLASS:
-        class_name = class_name_entry.get()
-        manage_inserting_class(class_name)
-    elif mode == AddMode.NEW_STUDENT:
-        if not class_listbox.curselection():
-            return tk.messagebox.showerror("Error", "No class given!")
+    alter_class = False
+    # make sure class was chosen in listbox
+    if mode == AddMode.UPDATE_CLASS or mode == AddMode.NEW_CLASS:
+        alter_class = True
+        class_given(class_listbox)
 
-        first_name = first_name_entry.get()
-        surname = surname_entry.get()
-        url = url_entry.get()
-        class_name = class_listbox.get(class_listbox.curselection())
+    map_mode_to_class: dict[AddMode: Callable] = {
+        AddMode.UPDATE_CLASS: create_update_class(
+            class_listbox.get(class_listbox.curselection()),
+            class_name_entry.get()
+        ),
+        AddMode.NEW_CLASS: create_insert_class(
+            class_name_entry.get()
+        ),
+        AddMode.NEW_STUDENT: create_insert_student(
+            first_name_entry.get(),
+            surname_entry.get(),
+            url_entry.get(),
+            class_listbox.get(class_listbox.curselection())
+        )
+    }
 
-        manage_inserting_student(first_name, surname, url, class_name)
+    object_altering_db = map_mode_to_class[mode]
 
+    db_alteration(object_altering_db, alter_class)
+
+    erase([class_listbox, class_name_entry, first_name_entry, surname_entry, url_entry])
     # erasing values from widgets: change state if needed, come back to the previous state,
     # update class_listbox after altering classes
