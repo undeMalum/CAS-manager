@@ -1,10 +1,12 @@
 from requests import get, exceptions
-from webbrowser import open
 from tkinter import *
 from tkinter import font
 from cas_managing_db import *
 from tkinter import messagebox
 from tkinter import ttk
+from src.frames.main_frame.searching_surname import EntrySurname
+from src.frames.main_frame.students_based_on_surname import search_for_student
+from src.frames.main_frame.go_to_url import go_url
 
 
 def main():
@@ -25,7 +27,7 @@ def main():
     # functions for widgets
     # function initialize when switching between frames
     def move(previous_frame: 'Frame', next_frame: 'Frame', classes_listbox: 'Listbox',
-             students_listbox: 'Listbox') -> None:
+             students_listbox: 'Listbox' = None):
         # forget chosen class to avoid situation when user can click "Accept" without choosing class
         global store_class_name
         store_class_name = ""
@@ -34,46 +36,27 @@ def main():
         previous_frame.place_forget()
         next_frame.pack()
         next_frame.place(relx=0.5, rely=0.5, anchor=CENTER)
+
         # refresh listbox displaying classes as some changes may occur
         fetch_classes(classes_listbox)
-        # add_frame has no listbox displaying students, therefore students_listbox is set to temp listbox
-        # making no changes
-        if classes_listbox != classes_display_add:
-            students_listbox.delete(0, END)
-            students_listbox.insert(END, "Choose class")
-        else:
-            # enable searching_name to reset
-            classes.focus_set()
-            if add_mode.get() == 3:  # if new class mode was chosen, listbox displaying classes must stay disabled
-                classes_listbox.config(state=DISABLED)
+
+        # enable searching_name to reset
+        classes_listbox.focus_set()
+
+        if students_listbox is None:
+            return
+
+        # reset students
+        students_listbox.delete(0, END)
+        students_listbox.insert(END, "Choose class")
 
     def erase(widgets: list) -> None:
         [widget.delete(0, END) for widget in widgets]
 
-    def change_state(widgets: list, mode: int) -> None:
-        # depending on a chosen mode, widgets behave differently
-        if mode == 1 or mode == 3:
-            state1, state2 = DISABLED, NORMAL
-        else:
-            state1, state2 = NORMAL, DISABLED
-
-        for number, widget in enumerate(widgets):
-            # avoiding the possibility of classes_display_add being available where there's no classes
-            if number == 4 and widget.get(0) == "Add classes":
-                widget.config(state=DISABLED)
-                break
-
-            # there's such a developed if statement here because this function is used in two frames:
-            # one with 2 modes, and the other with 3
-            if number == 3:
-                widget.config(state=state2)
-            elif number == 4 and mode == 1:  # class_display_add gets disabled only in add class mode
-                widget.config(state=state2)
-            else:
-                widget.config(state=state1)
-
-        # when in add_frame, erase entry boxes so the user doesn't have to do it by himself
-        erase(widgets[:-1]) if len(widgets) > 2 else None
+    def change_state(widgets_with_state: list[(ttk.Widget, int)]) -> None:
+        widget = 0
+        state_of_widget = 1
+        [widget_state[widget].config(state=widget_state[state_of_widget]) for widget_state in widgets_with_state]
 
     def accept_class(students_listbox: 'Listbox', classes_listbox: 'Listbox') -> None:
         students_listbox.delete(0, END)
@@ -81,106 +64,97 @@ def main():
         if not chosen_class:
             messagebox.showerror("Error", "Please choose a class!")
         else:
-            chosen_class = classes_listbox.get(chosen_class)
+            chosen_class = classes_listbox.get(chosen_class)  # convert indices into actual values
             fetch_students(students_listbox, chosen_class[0])
             global store_class_name
             store_class_name = chosen_class
 
-    def go_url(listbox_students: 'Listbox') -> None:
-        global store_class_name
-        selection = listbox_students.curselection()
-        if not selection or store_class_name == "":
-            messagebox.showerror("Error", "Please choose a student or click 'Accept'!")
-        # prevent fetching url if there's no students
-        elif listbox_students.get(selection) == "No students yet":
-            messagebox.showerror("Error", "Please add students first!")
-        else:
-            url = fetch_url(store_class_name[0], listbox_students.get(selection))
-            open(url)
+    def show_info(widget, pop_up_text: str, static_text: str) -> None:
+        widget.config(text=pop_up_text)
+        widget.after(3000, lambda: widget.config(text=static_text))
 
-    def reset_searching_surname() -> None:
-        searching_surname.delete(0, END)
-        searching_surname.insert(0, "Enter surname")
+    def all_parameters_given(widgets: list) -> bool:
+        for widget in widgets:
+            if not widget:
+                return False
+        return True
 
-    def search_for_student(surname: str) -> None:
-        global store_class_name
-        if store_class_name == "":
-            messagebox.showerror("Error", "Please choose a class or click 'Accept'!")
-        else:
-            searching_students = fetch_surname(store_class_name[0], surname)
-            if not searching_students:
-                students.focus_set()
-                messagebox.showerror("Error", "No students with given surname were found")
-            else:
-                students.focus_set()  # enable searching_name to reset
-                # displaying all students whose surname meets the given one
-                students.delete(0, END)
-                [students.insert(END, each_found) for each_found in searching_students]
+    def url_exists(url: str) -> bool:
+        try:
+            get(url)
+        except exceptions.RequestException:
+            return False
+        return True
 
-    def add_student(first_name: str, surname: str, class_name: tuple, url: str) -> None:
-        if not class_name:
-            messagebox.showerror("Error", "Please choose a class!")
-        elif first_name == "" or surname == "" or url == "":
-            messagebox.showerror("Error", "Please fill all gaps!")
-        else:
-            try:
-                get(url)
-            except exceptions.RequestException:
-                messagebox.showerror("Error", "Given website does not exist!")
-            else:
-                class_name = classes_display_add.get(class_name[0])
-                insert_student(first_name, surname, class_name[0], url)
-                # displaying information about adding student (temporarily)
-                updated_added_label.config(text="Added successfully!")
-                updated_added_label.after(3000, lambda: updated_added_label.config(text="(Updated/added class name)"))
-                # erasing entry boxes so the user doesn't have to do it by himself
-                erase([name_entry, surname_entry, url_entry])
+    def add_student(info_label: Label, add_listbox: Listbox, first_name: str, surname: str, url: str) -> str:
+        # get all indices from the chosen range
+        class_name_idxs = add_listbox.curselection()
 
-    def add_class(class_name: str) -> None:
-        if class_name == "":
-            messagebox.showerror("Error", "Please provide a name for a new class!")
-        else:
-            exists = insert_class(class_name)
-            if exists:
-                messagebox.showerror("Error", "Given class already exists!")
-            else:
-                # displaying information about adding class (temporarily)
-                updated_added_label.config(text="Added successfully!")
-                updated_added_label.after(3000, lambda: updated_added_label.config(text="(Updated/added class name)"))
-                # displaying newly added class
-                change_state([classes_display_add], 2)  # changing state of listbox to make changes
-                erase([classes_display_add, updated_added])
-                fetch_classes(classes_display_add)
-                change_state([classes_display_add], 1)  # going back to an initial state
+        # make sure all parameters are given
+        if not all_parameters_given([class_name_idxs, first_name, surname]):
+            return messagebox.showerror("Error", "Please fill all gaps!")
 
-    def update_given_class(old_class_name: tuple, new_class_name: str) -> None:
-        if not old_class_name:
-            messagebox.showerror("Error", "Please choose a class!")
-        elif new_class_name == "":
-            messagebox.showerror("Error", "Please provide a name for updated class!")
-        else:
-            old_class_name = classes_display_add.get(old_class_name)
-            exists = update_class_name(old_class_name[0], new_class_name)
-            if exists:
-                messagebox.showerror("Error", "Given class already exists! Delete or change already existing class.")
-            else:
-                # displaying information about updating class (temporarily)
-                updated_added_label.config(text="Updated successfully!")
-                updated_added_label.after(3000, lambda: updated_added_label.config(text="(Updated/added class name)"))
-                # displaying changes
-                fetch_classes(classes_display_add)
-                erase([updated_added])
+        # make sure the given url works
+        if not url_exists(url):
+            return messagebox.showerror("Error", "Given website does not exist!")
 
-    def chosen_mode_add(mode: int) -> None:
+        class_name_values = add_listbox.get(class_name_idxs[0])
+        insert_student(first_name, surname, class_name_values[0], url)
+        # displaying information about adding student (temporarily)
+        show_info(info_label, "Added successfully!", "(Updated/added class name)")
+
+        # erasing entry boxes so the user doesn't have to do it by himself
+        erase([name_entry, surname_entry, url_entry])
+
+    def add_class(info_label: Label, class_name: str, classes_listbox: Listbox) -> str:
+        # make sure all parameters were given
+        if not all_parameters_given([class_name]):
+            return messagebox.showerror("Error", "Please fill all gaps!")
+
+        exists = insert_class(class_name)
+        if exists:
+            return messagebox.showerror("Error", "Given class already exists!")
+
+        # displaying information about adding class (temporarily)
+        show_info(info_label, "Added successfully!", "(Updated/added class name)")
+
+        # displaying newly added class
+        classes_listbox.config(state=NORMAL)  # changing state of listbox to make changes
+        erase([classes_display_add, updated_added_name])
+        fetch_classes(classes_display_add)
+        classes_listbox.config(state=DISABLED)  # going back to an initial state
+
+    def update_given_class(info_label: Label, new_class_name: str, add_listbox: Listbox) -> str:
+        # get all indices from the chosen range
+        old_class_name_idxs = add_listbox.curselection()
+
+        # make sure all parameters were given
+        if not all_parameters_given([old_class_name_idxs, new_class_name]):
+            return messagebox.showerror("Error", "Please fill all gaps!")
+
+        old_class_name_values = add_listbox.get(old_class_name_idxs)
+        exists = update_class_name(old_class_name_values[0], new_class_name)
+        if exists:
+            return messagebox.showerror("Error", "Given class already exists! Delete or change already existing class.")
+
+        # displaying information about updating class (temporarily)
+        show_info(info_label, "Updated successfully!", "(Updated/added class name)")
+
+        # displaying changes
+        fetch_classes(add_listbox)
+        erase([updated_added_name])
+
+    def chosen_mode_add(mode: int, info_label: Label, given_class_name: str, classes_listbox: Listbox) -> None:
         if mode == 1:
-            update_given_class(classes_display_add.curselection(), updated_added.get())
+            update_given_class(info_label, given_class_name, classes_listbox)
         elif mode == 3:
-            add_class(updated_added.get())
+            add_student(info_label, classes_listbox, name_entry.get(), surname_entry.get(),
+                        url_entry.get())
         else:
-            add_student(name_entry.get(), surname_entry.get(), classes_display_add.curselection(), url_entry.get())
+            add_class(info_label, given_class_name, classes_listbox)
 
     def call_delete_students(students_to_be_deleted: tuple, their_class: str) -> None:
-        if their_class == "":
+        if not their_class:
             messagebox.showerror("Error", "Please choose a class or click 'Accept'!")
         elif not students_to_be_deleted:
             messagebox.showerror("Error", "Please choose a student(s)!")
@@ -226,41 +200,76 @@ def main():
     f = font.Font(size=12)
 
     # creating main frame (using stored urls)
-    main_frame = Frame(root, height=650, width=450)
+    main_frame = Frame(
+        root,
+        height=650,
+        width=450
+    )
 
     # creating widgets inside the main frame
     # for displaying and searching through available classes
     temp_classes = Listbox(main_frame)  # listbox used only to make a margin; it won't be considered
-    scrollbar_classes = Scrollbar(temp_classes, width=12)
-    classes = Listbox(temp_classes, selectmode="single", yscrollcommand=scrollbar_classes.set, font=f, width=12,
-                      height=11, highlightthickness=0, borderwidth=0)
+
+    scrollbar_classes = Scrollbar(
+        temp_classes,
+        width=12
+    )
+
+    classes = Listbox(
+        temp_classes,
+        selectmode="single",
+        yscrollcommand=scrollbar_classes.set,
+        font=f,
+        width=12,
+        height=11,
+        highlightthickness=0,
+        borderwidth=0
+    )
+
     scrollbar_classes.config(command=classes.yview)
     # initial fulfillment of classes listbox
     fetch_classes(classes)
     # for confirming choice of class
-    class_chosen_url = Button(main_frame, text="Accept",
-                              command=lambda: accept_class(students, classes))
+    class_chosen_url = Button(
+        main_frame,
+        text="Accept",
+        command=lambda: accept_class(
+            students,
+            classes
+        )
+    )
 
     # for searching students based on their surname within given class
-    searching_surname = Entry(main_frame)
-    searching_surname.insert(0, "Enter surname")
-    searching_surname.bind("<FocusIn>", lambda e: searching_surname.delete(0, END))
-    searching_surname.bind("<FocusOut>", lambda e: reset_searching_surname())
-    confirm_surname = Button(main_frame, text="Search", command=lambda: search_for_student(searching_surname.get()))
+    searching_surname = EntrySurname(main_frame)
+    searching_surname.initial_settings("Enter surname")
+    confirm_surname = Button(
+        main_frame,
+        text="Search",
+        command=lambda: search_for_student(
+            students,
+            searching_surname.get(),
+            store_class_name
+        )
+    )
 
     # for displaying available students within the given class
     scrollbar_students = Scrollbar(main_frame)
-    students = Listbox(main_frame, selectmode="single", yscrollcommand=scrollbar_students.set, height=10, font=f)
+    students = Listbox(
+        main_frame,
+        selectmode="single",
+        yscrollcommand=scrollbar_students.set,
+        height=10,
+        font=f
+    )
     scrollbar_students.config(command=students.yview)
     # warning that reminds user of choosing class
     students.insert(END, "Choose class")
     # for redirecting users into the chosen student's portfolio
-    go_to_url = Button(main_frame, text="Go", command=lambda: go_url(students))
+    go_to_url = Button(main_frame, text="Go", command=lambda: go_url(students, store_class_name))
 
     # going to other functionalities of the program, ie adding/updating and removing elements
     go_to_add_main = Button(main_frame, text="Add/Update", height=3, command=lambda: move(main_frame, add_frame,
-                                                                                          classes_display_add,
-                                                                                          temp_classes_add))
+                                                                                          classes_display_add))
     go_to_remove_main = Button(main_frame, text="Remove", height=3, command=lambda: move(main_frame, remove_frame,
                                                                                          classes_display_rem,
                                                                                          students_display_rem))
@@ -291,12 +300,24 @@ def main():
     # creating widgets inside the remove frame
     # creating widgets to choose whether a user wants to remove class(es) or student(s)
     rem_class_student = IntVar(remove_frame, 2)
-    classes_remove_mode = Radiobutton(remove_frame, text="Classes mode", value=1, variable=rem_class_student,
-                                      command=lambda: change_state([students_display_rem, class_chosen_rem],
-                                                                   rem_class_student.get()))
-    students_remove_mode = Radiobutton(remove_frame, text="Students mode", value=2, variable=rem_class_student,
-                                       command=lambda: change_state([students_display_rem, class_chosen_rem],
-                                                                    rem_class_student.get()))
+    remove_class = Radiobutton(
+        remove_frame,
+        text="Classes mode",
+        value=1,
+        variable=rem_class_student,
+        command=lambda: change_state(
+            changing_state_dict["remove_class"]
+        )
+    )
+    remove_students = Radiobutton(
+        remove_frame,
+        text="Students mode",
+        value=2,
+        variable=rem_class_student,
+        command=lambda: change_state(
+            changing_state_dict["remove_student"]
+        )
+    )
 
     # listboxes to choose (classes and students)
     temp_classes_rem = Listbox(remove_frame)
@@ -316,14 +337,13 @@ def main():
     go_to_main_rem = Button(remove_frame, text="Portfolios", height=3, command=lambda: move(remove_frame, main_frame,
                                                                                             classes, students))
     go_to_add_rem = Button(remove_frame, text="Add/Update", height=3, command=lambda: move(remove_frame, add_frame,
-                                                                                           classes_display_add,
-                                                                                           temp_classes_add))
+                                                                                           classes_display_add))
     confirm_remove = Button(remove_frame, text="Confirm", height=3,
                             command=lambda: chosen_mode_rem(rem_class_student.get()))
 
     # placing widgets inside remove frame
-    classes_remove_mode.grid(column=0, row=0, sticky=E)
-    students_remove_mode.grid(column=3, row=0, sticky=W)
+    remove_class.grid(column=0, row=0, sticky=E)
+    remove_students.grid(column=3, row=0, sticky=W)
 
     temp_classes_rem.grid(column=0, row=1, sticky=NSEW)
     # classes_nav_rem and classes_display_rem are placed inside temp_classes_rem
@@ -343,16 +363,34 @@ def main():
 
     # creating widgets inside add frame
     # three 'modes' of this frame
-    add_mode = IntVar(add_frame, 2)
-    update_class = Radiobutton(add_frame, text="Update class", value=1, variable=add_mode,
-                               command=lambda: change_state([name_entry, surname_entry, url_entry, updated_added,
-                                                            classes_display_add], add_mode.get()))
-    new_class = Radiobutton(add_frame, text="New class", value=3, variable=add_mode,
-                            command=lambda: change_state([name_entry, surname_entry, url_entry, updated_added,
-                                                         classes_display_add], add_mode.get()))
-    new_student = Radiobutton(add_frame, text="New student", value=2, variable=add_mode,
-                              command=lambda: change_state([name_entry, surname_entry, url_entry, updated_added,
-                                                            classes_display_add], add_mode.get()))
+    add_mode = IntVar(add_frame, 3)
+    update_class = Radiobutton(
+        add_frame, 
+        text="Update class", 
+        value=1, 
+        variable=add_mode,
+        command=lambda: change_state(
+            changing_state_dict["update_class"]
+        )
+    )
+    new_class = Radiobutton(
+        add_frame,
+        text="New class",
+        value=2,
+        variable=add_mode,
+        command=lambda: change_state(
+            changing_state_dict["new_class"]
+        )
+    )
+    new_student = Radiobutton(
+        add_frame,
+        text="New student",
+        value=3,
+        variable=add_mode,
+        command=lambda: change_state(
+            changing_state_dict["new_student"]
+        )
+    )
 
     # displaying class
     temp_classes_add = Listbox(add_frame)
@@ -363,7 +401,7 @@ def main():
 
     # entry for names of either updated class or new one
     updated_added_label = Label(add_frame, text="(Updated/added class name)")
-    updated_added = Entry(add_frame, state=DISABLED)
+    updated_added_name = Entry(add_frame, state=DISABLED)
 
     # entries for essential information about added students with his/her portfolio
     name_label = Label(add_frame, text="Name:")
@@ -379,7 +417,44 @@ def main():
     go_to_rem_add = Button(add_frame, text="Remove", height=3, command=lambda: move(add_frame, remove_frame,
                                                                                     classes_display_rem,
                                                                                     students_display_rem))
-    make_change = Button(add_frame, text="Add", command=lambda: chosen_mode_add(add_mode.get()))
+    make_change = Button(
+        add_frame,
+        text="Add",
+        command=lambda: chosen_mode_add(
+            add_mode.get(),
+            updated_added_label,
+            updated_added_name.get(),
+            classes_display_add
+        )
+    )
+
+    # this dictionary contains prepared sets of objects to be used by RadioButtons
+    changing_state_dict = {
+        "update_class": [(name_entry, DISABLED),
+                         (surname_entry, DISABLED),
+                         (url_entry, DISABLED),
+                         (updated_added_name, NORMAL),
+                         (classes_display_add, NORMAL)
+                         ],
+        "new_class": [(name_entry, DISABLED),
+                      (surname_entry, DISABLED),
+                      (url_entry, DISABLED),
+                      (updated_added_name, NORMAL),
+                      (classes_display_add, DISABLED)
+                      ],
+        "new_student": [(name_entry, NORMAL),
+                        (surname_entry, NORMAL),
+                        (url_entry, NORMAL),
+                        (updated_added_name, DISABLED),
+                        (classes_display_add, NORMAL)
+                        ],
+        "remove_class": [(students_display_rem, DISABLED),
+                         (class_chosen_rem, DISABLED)
+                         ],
+        "remove_student": [(students_display_rem, NORMAL),
+                           (class_chosen_rem, NORMAL)
+                           ]
+    }
 
     # putting widgets inside add frame
     update_class.grid(column=0, row=0, sticky=NSEW)
@@ -392,7 +467,7 @@ def main():
     classes_display_add.grid(column=1, row=0, padx=5, sticky=NSEW)
 
     updated_added_label.grid(column=1, row=4, sticky=NSEW)
-    updated_added.grid(column=0, row=4, sticky=NSEW)
+    updated_added_name.grid(column=0, row=4, sticky=NSEW)
 
     name_label.grid(column=1, row=1, sticky=S)
     name_entry.grid(column=1, row=2, padx=2, sticky=EW)
