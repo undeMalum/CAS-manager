@@ -1,19 +1,15 @@
-from the_base_for_inserting_updating_db import AlterDB
+from the_base_for_inserting_updating_db import AlterDB, URLIsCorrect, DataIsGiven
 
 
 class UpdateClass(AlterDB):
     """This class manages changing a class record."""
+    __old_class_name = DataIsGiven()
+    __new_class_name = DataIsGiven()
 
     def __init__(self, old_class_name: tuple[str], new_class_name: str):
         super().__init__()
         self.__old_class_name = old_class_name
         self.__new_class_name = new_class_name
-
-    def data_is_correct(self) -> bool:
-        if not self.all_parameters_given([self.__old_class_name, self.__new_class_name]):
-            return False
-
-        return True
 
     # altering database: updating classes
     def alter(self) -> None:
@@ -23,16 +19,11 @@ class UpdateClass(AlterDB):
 
 class NewClass(AlterDB):
     """This class manages creating a class record."""
+    __class_name = DataIsGiven()
 
     def __init__(self, class_name: str):
         super().__init__()
         self.__class_name = class_name
-
-    def data_is_correct(self) -> bool:
-        if not self.all_parameters_given([self.__class_name]):
-            return False
-
-        return True
 
     # altering database: inserting classes
     def alter(self) -> None:
@@ -42,6 +33,10 @@ class NewClass(AlterDB):
 
 class NewStudent(AlterDB):
     """This class manages creating a student record."""
+    __first_name = DataIsGiven()
+    __surname = DataIsGiven
+    __url = URLIsCorrect()
+    __class_name = DataIsGiven()
 
     def __init__(self,
                  first_name: str, surname: str,
@@ -51,18 +46,6 @@ class NewStudent(AlterDB):
         self.__surname = surname
         self.__url = url
         self.__class_name = class_name
-
-    def data_is_correct(self) -> bool:
-        if not self.all_parameters_given([
-                self.__first_name, self.__surname,
-                self.__url, self.__class_name
-                ]):
-            return False
-
-        if not self.url_exists(self.__url):
-            return False
-
-        return True
 
     # altering database: inserting students
     def alter(self) -> None:

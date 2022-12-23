@@ -1,23 +1,22 @@
 import sqlite3
 from tkinter import END, Listbox, NORMAL
-from abc import ABC, abstractmethod
-from enum import Enum, auto
 
 # creating database with 2 table; classes and students
-conn = sqlite3.connect("cas_db.db")
+DATABASE = "cas_db.db"
+conn = sqlite3.connect(DATABASE)
 cursor = conn.cursor()
 
-cursor.execute("""create table if not exists classes(
-                class_id integer primary key,
-                class_name text not null unique
+cursor.execute("""CREATE TABLE IF NOT EXISTS classes(
+                class_id INTEGER PRIMARY KEY,
+                class_name TEXT NOT NULL UNIQUE
                 );""")
 
-cursor.execute("""create table if not exists students(
-                first_name text not null,
-                surname text not null,
-                class_id integer,
-                url text not null,
-                foreign key (class_id) references classes(class_id)
+cursor.execute("""create TABLE IF NOT EXISTS students(
+                first_name TEXT NOT NULL,
+                surname TEXT NOT NULL,
+                class_id INTEGER,
+                url TEXT NOT NULL,
+                FOREIGN KEY (class_id) REFERENCES classes(class_id)
                 );""")
 
 conn.close()
@@ -25,9 +24,9 @@ conn.close()
 
 # functions employing db: to be imported in main file
 def fetch_classes(listbox: Listbox) -> None:
-    c = sqlite3.connect("cas_db.db")
+    c = sqlite3.connect(DATABASE)
     cur = c.cursor()
-    prompt = "select class_name from classes order by class_name;"
+    prompt = "SELECT class_name FROM classes ORDER BY class_name;"
     cur.execute(prompt)
     available_classes = cur.fetchall()
 
@@ -48,9 +47,11 @@ def fetch_classes(listbox: Listbox) -> None:
 
 
 def fetch_class(class_name: str) -> int:
-    c = sqlite3.connect("cas_db.db")
+    """Fetches class_id based on class_name from classes table
+    to use in students table"""
+    c = sqlite3.connect(DATABASE)
     cur = c.cursor()
-    prompt = "select class_id from classes where class_name = (:class_name);"
+    prompt = "SELECT class_id FROM classes WHERE class_name = (:class_name);"
     cur.execute(prompt, {"class_name": class_name})
     class_id = cur.fetchone()[0]
     c.close()
@@ -58,11 +59,11 @@ def fetch_class(class_name: str) -> int:
 
 
 def fetch_surname(chosen_class: str, surname: str) -> list[str]:
-    c = sqlite3.connect("cas_db.db")
+    c = sqlite3.connect(DATABASE)
     cur = c.cursor()
     class_id = fetch_class(chosen_class)
-    prompt = """select first_name, surname from students where class_id = (:class_id) and surname = (:surname) 
-    order by first_name;"""
+    prompt = """SELECT first_name, surname FROM students WHERE class_id = (:class_id) AND surname = (:surname) 
+    ORDER BY surname;"""
     cur.execute(prompt, {"class_id": class_id, "surname": surname})
     searching_student = cur.fetchall()
     c.close()
@@ -70,10 +71,10 @@ def fetch_surname(chosen_class: str, surname: str) -> list[str]:
 
 
 def fetch_students(students_listbox: Listbox, chosen_class: str) -> None:
-    c = sqlite3.connect("cas_db.db")
+    c = sqlite3.connect(DATABASE)
     cur = c.cursor()
     class_id = fetch_class(chosen_class)
-    prompt = "select first_name, surname from students where class_id = (:class_id) order by surname;"
+    prompt = "SELECT first_name, surname FROM students WHERE class_id = (:class_id) ORDER BY surname;"
     cur.execute(prompt, {"class_id": class_id})
     available_students = cur.fetchall()
     if not available_students:
@@ -85,11 +86,11 @@ def fetch_students(students_listbox: Listbox, chosen_class: str) -> None:
 
 
 def fetch_url(chosen_class: str, chosen_student: tuple[str, str]) -> str:
-    c = sqlite3.connect("cas_db.db")
+    c = sqlite3.connect(DATABASE)
     cur = c.cursor()
     class_id = fetch_class(chosen_class)
-    prompt = """select url from students where class_id = (:class_id) and first_name = (:first_name)
-    and surname = (:surname);"""
+    prompt = """SELECT url FROM students WHERE class_id = (:class_id) AND first_name = (:first_name)
+    AND surname = (:surname);"""
     cur.execute(prompt, {"class_id": class_id, "first_name": chosen_student[0], "surname": chosen_student[1]})
     url = cur.fetchone()[0]
     c.close()
@@ -97,17 +98,17 @@ def fetch_url(chosen_class: str, chosen_student: tuple[str, str]) -> str:
 
 
 def insert_student(first_name: str, surname: str, chosen_class: str, url: str) -> None:
-    c = sqlite3.connect("cas_db.db")
+    c = sqlite3.connect(DATABASE)
     cur = c.cursor()
     class_id = fetch_class(chosen_class)
-    prompt = """insert into students values (:first_name, :surname, :class_id, :url)"""
+    prompt = """INSERT INTO students VALUES (:first_name, :surname, :class_id, :url)"""
     cur.execute(prompt, {"first_name": first_name, "surname": surname, "class_id": class_id, "url": url})
     c.commit()
     c.close()
 
 
 def exists_in_db(prompt: str, column: str, value: str) -> bool:
-    c = sqlite3.connect("cas_db.db")
+    c = sqlite3.connect(DATABASE)
     cur = c.cursor()
 
     cur.execute(prompt, {column: value})
@@ -121,10 +122,10 @@ def exists_in_db(prompt: str, column: str, value: str) -> bool:
 
 
 def insert_class(class_name: str) -> bool:
-    c = sqlite3.connect("cas_db.db")
+    c = sqlite3.connect(DATABASE)
     cur = c.cursor()
 
-    prompt1 = "select class_name from classes where class_name = (:class_name)"
+    prompt1 = "SELECT class_name FROM classes WHERE class_name = (:class_name)"
     if exists_in_db(prompt1, "class_name", class_name) is True:
         c.close()
         return True
@@ -137,7 +138,7 @@ def insert_class(class_name: str) -> bool:
 
 
 def update_class_name(old_class_name: str, new_class_name: str) -> bool:
-    c = sqlite3.connect("cas_db.db")
+    c = sqlite3.connect(DATABASE)
     cur = c.cursor()
 
     prompt1 = "select class_name from classes where class_name = (:class_name)"
@@ -152,7 +153,7 @@ def update_class_name(old_class_name: str, new_class_name: str) -> bool:
 
 
 def delete_students(students_to_be_deleted: list, their_class: str) -> None:
-    c = sqlite3.connect("cas_db.db")
+    c = sqlite3.connect(DATABASE)
     cur = c.cursor()
     class_id = fetch_class(their_class)
     prompt = "delete from students where class_id = (:class_id) and first_name = (:first_name) and surname = (:surname)"
@@ -163,7 +164,7 @@ def delete_students(students_to_be_deleted: list, their_class: str) -> None:
 
 
 def delete_class(class_name: str) -> None:
-    c = sqlite3.connect("cas_db.db")
+    c = sqlite3.connect(DATABASE)
     cur = c.cursor()
     class_id = fetch_class(class_name)
     prompt1 = "delete from classes where class_id = (:class_id)"

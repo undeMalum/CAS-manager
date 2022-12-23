@@ -144,12 +144,6 @@ def main():
         fetch_classes(add_listbox)
         erase([updated_added_name])
 
-    add_frame_store_function_mode = {
-        1: update_given_class,
-        2: add_class,
-        3: add_student
-    }
-
     def chosen_mode_add(mode: int, info_label: Label, given_class_name: str, classes_listbox: Listbox) -> None:
         if mode == 1:
             update_given_class(info_label, given_class_name, classes_listbox)
@@ -160,7 +154,7 @@ def main():
             add_class(info_label, given_class_name, classes_listbox)
 
     def call_delete_students(students_to_be_deleted: tuple, their_class: str) -> None:
-        if their_class == "":
+        if not their_class:
             messagebox.showerror("Error", "Please choose a class or click 'Accept'!")
         elif not students_to_be_deleted:
             messagebox.showerror("Error", "Please choose a student(s)!")
