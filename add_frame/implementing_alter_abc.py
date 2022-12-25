@@ -1,12 +1,13 @@
-from the_base_for_inserting_updating_db import AlterDB, URLIsCorrect, DataIsGiven
+import the_base_for_inserting_updating_db as base
+import validation_descriptors
 
 
-class UpdateClass(AlterDB):
+class UpdateClass(base.AlterDB):
     """This class manages changing a class record."""
-    __old_class_name = DataIsGiven()
-    __new_class_name = DataIsGiven()
+    __old_class_name = validation_descriptors.UpdatingNameExists()
+    __new_class_name = validation_descriptors.RepeatsInDB()
 
-    def __init__(self, old_class_name: tuple[str], new_class_name: str):
+    def __init__(self, old_class_name: str, new_class_name: str):
         super().__init__()
         self.__old_class_name = old_class_name
         self.__new_class_name = new_class_name
@@ -14,12 +15,16 @@ class UpdateClass(AlterDB):
     # altering database: updating classes
     def alter(self) -> None:
         prompt = self.prompts["update_class"]
-        self.cur.execute(prompt, {"new_class_name": self.__new_class_name, "old_class_name": self.__old_class_name})
+        data = {
+            "new_class_name": self.__new_class_name,
+            "old_class_name": self.__old_class_name
+        }
+        self.cur.execute(prompt, data)
 
 
-class NewClass(AlterDB):
+class NewClass(base.AlterDB):
     """This class manages creating a class record."""
-    __class_name = DataIsGiven()
+    __class_name = validation_descriptors.RepeatsInDB()
 
     def __init__(self, class_name: str):
         super().__init__()
@@ -28,19 +33,22 @@ class NewClass(AlterDB):
     # altering database: inserting classes
     def alter(self) -> None:
         prompt = self.prompts["insert_class"]
-        self.cur.execute(prompt, {"class_name": self.__class_name})
+        data = {
+            "class_name": self.__class_name
+        }
+        self.cur.execute(prompt, data)
 
 
-class NewStudent(AlterDB):
+class NewStudent(base.AlterDB):
     """This class manages creating a student record."""
-    __first_name = DataIsGiven()
-    __surname = DataIsGiven
-    __url = URLIsCorrect()
-    __class_name = DataIsGiven()
+    __first_name = validation_descriptors.DataIsGiven()
+    __surname = validation_descriptors.DataIsGiven()
+    __url = validation_descriptors.URLIsCorrect()
+    __class_name = validation_descriptors.DataIsGiven()
 
     def __init__(self,
                  first_name: str, surname: str,
-                 url: str, class_name: tuple[str]):
+                 url: str, class_name: str):
         super().__init__()
         self.__first_name = first_name
         self.__surname = surname
@@ -51,6 +59,8 @@ class NewStudent(AlterDB):
     def alter(self) -> None:
         class_id = self.fetch_class_id(self.__class_name)
         prompt = self.prompts["insert_student"]
-        self.cur.execute(prompt, {
+        data = {
             "first_name": self.__first_name, "surname": self.__surname,
-            "url": self.__url, "class_id": class_id})
+            "url": self.__url, "class_id": class_id
+        }
+        self.cur.execute(prompt, data)
