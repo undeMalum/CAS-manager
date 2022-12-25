@@ -11,7 +11,7 @@ from implementing_alter_abc import NewStudent, NewClass, UpdateClass
 ])
 def test_validate_input_student(first_name, surname, url, class_id):
     # url raises different exception, and it should be caught as well
-    with pytest.raises((ValueError, requests.exceptions.RequestException)):
+    with pytest.raises(ValueError):
         new_student = NewStudent(first_name, surname, url, class_id)
 
 

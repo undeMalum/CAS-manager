@@ -29,9 +29,34 @@ class URLIsCorrect:
         try:
             get(value)
         except exceptions.RequestException:
-            raise exceptions.RequestException("Website with given url does not exist.")
+            raise ValueError("Website with given url does not exist.") from None
         else:
             instance.name = value
+
+
+def exists_in_db(value: str, column: str = "class_name") -> bool:
+    prompt = "SElECT class_name FROM classes WHERE class_name = (:class_name);"
+    c = sqlite3.connect(DATABASE)
+    cur = c.cursor()
+    cur.execute(prompt, {column: value})
+    fetched_value = cur.fetchone()
+
+    if fetched_value is not None:
+        return True
+    return False
+
+
+class ExistsInDB:
+    def __set_name__(self, owner, name):
+        self.name = name
+
+    def __get__(self, instance, owner):
+        return instance.name
+
+    def __set__(self, instance, value):
+        if exists_in_db(value):
+            raise ValueError("Given class already exists!")
+        instance.name = value
 
 
 class AlterDB(ABC):
@@ -41,7 +66,7 @@ class AlterDB(ABC):
         "test_existence": "SElECT class_name FROM classes WHERE class_name = (:class_name);",
         "retrieve_id": "SELECT class_id FROM classes WHERE class_name = (:class_name);",
         "insert_class": "INSERT INTO classes(class_name) VALUES (:class_name);",
-        "update_class": "SELECT class_name FROM classes WHERE class_name = (:old_class_name);",
+        "update_class": "UPDATE classes SET class_name = (:new_class_name) WHERE class_name = (:old_class_name);",
         "insert_student": "INSERT INTO students VALUES (:first_name, :surname, :class_id, :url);"
     }
 
