@@ -44,7 +44,7 @@ class NewStudent(base.AlterDB):
     __first_name = validation_descriptors.DataIsGiven()
     __surname = validation_descriptors.DataIsGiven()
     __url = validation_descriptors.URLIsCorrect()
-    __class_name = validation_descriptors.DataIsGiven()
+    __class_name = validation_descriptors.UpdatingNameExists()
 
     def __init__(self,
                  first_name: str, surname: str,

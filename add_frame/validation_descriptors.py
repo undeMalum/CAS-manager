@@ -1,20 +1,20 @@
+from add_frame_constants import DATABASE
+
 from requests import get, exceptions
 import sqlite3
 
-DATABASE = "cas_db.db"
-
 
 def exists_in_db(value: (str,), column: str = "class_name") -> bool:
-    """Checks if a class og the given name exists or not"""
+    """Checks if a class of the given name exists or not"""
     prompt = "SElECT class_name FROM classes WHERE class_name = (:class_name);"
     c = sqlite3.connect(DATABASE)
     cur = c.cursor()
     cur.execute(prompt, {column: value})
     fetched_value = cur.fetchone()
 
-    if fetched_value is not None:
-        return True
-    return False
+    if fetched_value is None:
+        return False
+    return True
 
 
 class ValidationTemplate:
@@ -23,7 +23,7 @@ class ValidationTemplate:
         self.name = name
 
     def __get__(self, instance, owner):
-        return instance.name
+        return instance.__dict__[self.name]
 
 
 class DataIsGiven(ValidationTemplate):
@@ -31,7 +31,7 @@ class DataIsGiven(ValidationTemplate):
     def __set__(self, instance, value):
         if not value:
             raise ValueError("Provided data is incorrect.") from None
-        instance.name = value
+        instance.__dict__[self.name] = value
 
 
 class URLIsCorrect(ValidationTemplate):
@@ -42,7 +42,7 @@ class URLIsCorrect(ValidationTemplate):
         except exceptions.RequestException:
             raise ValueError("Website with given url does not exist.") from None
         else:
-            instance.name = value
+            instance.__dict__[self.name] = value
 
 
 class RepeatsInDB(ValidationTemplate):
@@ -51,7 +51,7 @@ class RepeatsInDB(ValidationTemplate):
     def __set__(self, instance, value):
         if exists_in_db(value) or not value:
             raise ValueError("Given class already exists or is not given!") from None
-        instance.name = value
+        instance.__dict__[self.name] = value
 
 
 class UpdatingNameExists(ValidationTemplate):
@@ -59,4 +59,4 @@ class UpdatingNameExists(ValidationTemplate):
     def __set__(self, instance, value):
         if not exists_in_db(value):
             raise ValueError("Choose class to be updated!") from None
-        instance.name = value
+        instance.__dict__[self.name] = value

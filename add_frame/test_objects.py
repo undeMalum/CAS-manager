@@ -1,14 +1,42 @@
+from inserting_updating_interacting_with_db import manage_interaction_with_db, create_mode_to_object_dict
+import implementing_alter_abc as imp
+from add_modes import AddMode
+from add_frame_constants import DATABASE
+
 import pytest
-from insterting_updating_interacting_with_gui import manage_interaction_with_db
-from insterting_updating_interacting_with_gui import AddMode
+import sqlite3
+
+
+@pytest.mark.dbalteration
+@pytest.mark.parametrize("""chosen_class, 
+                            class_name, first_name,
+                            surname, url""", [
+    ("n", "n", "n", "n", "n"),
+    # ("n", "o", "n", "n", "n"),
+    # ("n", "n", "n", "n", "https://undemalum.github.io/portfolio/posts/school-festival/")
+])
+def test_create_mode_to_object_dict(chosen_class: str,
+                                         class_name: str, first_name: str,
+                                         surname: str, url: str):
+    mapped = create_mode_to_object_dict(
+        chosen_class,
+        class_name,
+        first_name,
+        surname,
+        url
+    )
+
+    assert mapped == {AddMode.UPDATE_CLASS: (imp.UpdateClass, chosen_class, class_name),
+        AddMode.NEW_CLASS: (imp.NewClass, class_name),
+        AddMode.NEW_STUDENT:  (imp.NewStudent, first_name, surname, url, chosen_class)}
 
 
 @pytest.mark.dbalteration
 @pytest.mark.parametrize("""mode, chosen_class, 
                             class_name, first_name,
                             surname, url""", [
-    (AddMode.UPDATE_CLASS, "n", "n", "n", "n", "n"),
     (AddMode.NEW_CLASS, "n", "n", "n", "n", "n"),
+    (AddMode.UPDATE_CLASS, "n", "o", "n", "n", "n"),
     (AddMode.NEW_STUDENT, "n", "n", "n", "n", "https://undemalum.github.io/portfolio/posts/school-festival/")
 ]
 )
@@ -32,27 +60,44 @@ def test_manage_interaction_with_db_true(mode: AddMode, chosen_class: str,
 @pytest.mark.parametrize("""mode, chosen_class,
                             class_name, first_name,
                             surname, url, error_description""", [
-    (AddMode.UPDATE_CLASS, "", "", "", "", "", "Provided data is incorrect."),
-    (AddMode.UPDATE_CLASS, "", "", "", "", ""),
-    (AddMode.UPDATE_CLASS, "", "", "", "", ""),
-    (AddMode.NEW_STUDENT, "n", "n", "n", "n", "")
+    (AddMode.UPDATE_CLASS, "", "", "", "", "", "Choose class to be updated!"),
+    (AddMode.UPDATE_CLASS, "n", "", "", "", "", "Given class already exists or is not given!"),
+    (AddMode.UPDATE_CLASS, "n", "n", "", "", "", "Given class already exists or is not given!"),
+    (AddMode.NEW_STUDENT, "n", "n", "", "", "", "Provided data is incorrect."),
+    (AddMode.NEW_STUDENT, "n", "n", "n", "n", "", "Website with given url does not exist.")
 ]
 )
-def test_manage_interaction_with_db_true(mode: AddMode, chosen_class: tuple[str],
-                                         class_name: str, first_name: str,
-                                         surname: str, url: str):
-    info, description = manage_interaction_with_db(
-        mode,
-        chosen_class,
-        class_name,
-        first_name,
-        surname,
-        url
-    )
+def test_manage_interaction_with_db_false(mode: AddMode, chosen_class: str,
+                                          class_name: str, first_name: str,
+                                          surname: str, url: str, error_description):
+    with pytest.raises(ValueError):
+        info, description = manage_interaction_with_db(
+            mode,
+            chosen_class,
+            class_name,
+            first_name,
+            surname,
+            url
+        )
+        assert info == "Error"
+        assert description == error_description
 
-    assert info == "Error"
-    assert description == "Operation completed successfully!"
-#
-#
-# def test_alter_db():
-#
+
+@pytest.mark.dbalteration
+def test_delete_from_db():
+    """Delete what was added during the test"""
+    c = sqlite3.connect(DATABASE)
+    cur = c.cursor()
+    prompt1 = """DELETE FROM students 
+    WHERE class_id = 6"""
+    prompt2 = """DELETE FROM classes
+    WHERE class_id = 6"""
+    cur.execute(prompt1)
+    c.commit()
+    cur.execute(prompt2)
+    c.commit()
+    cur.execute("SELECT * FROM students")
+    print(cur.fetchall())
+    cur.execute("SELECT * FROM classes")
+    print(cur.fetchall())
+    c.close()

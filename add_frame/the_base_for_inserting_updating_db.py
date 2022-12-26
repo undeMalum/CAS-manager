@@ -1,7 +1,7 @@
+from add_frame_constants import DATABASE
+
 from abc import ABC, abstractmethod
 import sqlite3
-
-DATABASE = "cas_db.db"
 
 
 class AlterDB(ABC):
