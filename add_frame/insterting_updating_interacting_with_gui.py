@@ -1,4 +1,4 @@
-import inserting_updating_interacting_with_db
+import inserting_updating_interacting_with_db as db_interaction
 from add_modes import AddMode
 import cas_managing_db
 
@@ -16,13 +16,17 @@ def choose_mode_add(mode: AddMode, class_listbox: tk.Listbox,
                     surname_entry: ttk.Entry, url_entry: ttk.Entry) -> str:
     """Works as an API between GUI and database"""
     # interact with database
-    info, description = inserting_updating_interacting_with_db.manage_interaction_with_db(
-        mode,
+    map_mode_to_object = db_interaction.create_mode_to_object_dict(
         class_listbox.get(class_listbox.curselection())[0],
         class_name_entry.get(),
         first_name_entry.get(),
         surname_entry.get(),
         url_entry.get()
+    )
+
+    info, description = db_interaction.manage_interaction_with_db(
+        mode,
+        map_mode_to_object
     )
     if info == "Error":
         return tk.messagebox.showerror(info, description)

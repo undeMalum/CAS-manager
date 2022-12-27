@@ -12,8 +12,8 @@ import sqlite3
                             class_name, first_name,
                             surname, url""", [
     ("n", "n", "n", "n", "n"),
-    # ("n", "o", "n", "n", "n"),
-    # ("n", "n", "n", "n", "https://undemalum.github.io/portfolio/posts/school-festival/")
+    ("n", "o", "n", "n", "n"),
+    ("n", "n", "n", "n", "https://undemalum.github.io/portfolio/posts/school-festival/")
 ])
 def test_create_mode_to_object_dict(chosen_class: str,
                                          class_name: str, first_name: str,
@@ -26,9 +26,13 @@ def test_create_mode_to_object_dict(chosen_class: str,
         url
     )
 
-    assert mapped == {AddMode.UPDATE_CLASS: (imp.UpdateClass, chosen_class, class_name),
+    to_compare = {
+        AddMode.UPDATE_CLASS: (imp.UpdateClass, chosen_class, class_name),
         AddMode.NEW_CLASS: (imp.NewClass, class_name),
-        AddMode.NEW_STUDENT:  (imp.NewStudent, first_name, surname, url, chosen_class)}
+        AddMode.NEW_STUDENT: (imp.NewStudent, first_name, surname, url, chosen_class)
+    }
+
+    assert mapped == to_compare
 
 
 @pytest.mark.dbalteration
@@ -37,19 +41,22 @@ def test_create_mode_to_object_dict(chosen_class: str,
                             surname, url""", [
     (AddMode.NEW_CLASS, "n", "n", "n", "n", "n"),
     (AddMode.UPDATE_CLASS, "n", "o", "n", "n", "n"),
-    (AddMode.NEW_STUDENT, "n", "n", "n", "n", "https://undemalum.github.io/portfolio/posts/school-festival/")
+    (AddMode.NEW_STUDENT, "o", "n", "n", "n", "https://undemalum.github.io/portfolio/posts/school-festival/")
 ]
 )
 def test_manage_interaction_with_db_true(mode: AddMode, chosen_class: str,
                                          class_name: str, first_name: str,
                                          surname: str, url: str):
-    info, description = manage_interaction_with_db(
-        mode,
+    mode_to_object_dict = create_mode_to_object_dict(
         chosen_class,
         class_name,
         first_name,
         surname,
         url
+    )
+    info, description = manage_interaction_with_db(
+        mode,
+        mode_to_object_dict
     )
 
     assert description == "Operation completed successfully!"
@@ -61,8 +68,8 @@ def test_manage_interaction_with_db_true(mode: AddMode, chosen_class: str,
                             class_name, first_name,
                             surname, url, error_description""", [
     (AddMode.UPDATE_CLASS, "", "", "", "", "", "Choose class to be updated!"),
-    (AddMode.UPDATE_CLASS, "n", "", "", "", "", "Given class already exists or is not given!"),
-    (AddMode.UPDATE_CLASS, "n", "n", "", "", "", "Given class already exists or is not given!"),
+    (AddMode.UPDATE_CLASS, "o", "", "", "", "", "Given class already exists or is not given!"),
+    (AddMode.UPDATE_CLASS, "n", "n", "", "", "", "Choose class to be updated!"),
     (AddMode.NEW_STUDENT, "n", "n", "", "", "", "Provided data is incorrect."),
     (AddMode.NEW_STUDENT, "n", "n", "n", "n", "", "Website with given url does not exist.")
 ]
@@ -70,17 +77,19 @@ def test_manage_interaction_with_db_true(mode: AddMode, chosen_class: str,
 def test_manage_interaction_with_db_false(mode: AddMode, chosen_class: str,
                                           class_name: str, first_name: str,
                                           surname: str, url: str, error_description):
-    with pytest.raises(ValueError):
-        info, description = manage_interaction_with_db(
-            mode,
-            chosen_class,
-            class_name,
-            first_name,
-            surname,
-            url
-        )
-        assert info == "Error"
-        assert description == error_description
+    mode_to_object_dict = create_mode_to_object_dict(
+        chosen_class,
+        class_name,
+        first_name,
+        surname,
+        url
+    )
+    info, description = manage_interaction_with_db(
+        mode,
+        mode_to_object_dict
+    )
+    assert info == "Error"
+    assert description == error_description
 
 
 @pytest.mark.dbalteration
