@@ -20,7 +20,7 @@ def update_classes(classes_listbox: Listbox, students_listbox: Listbox = None):
     # enable searching_name to reset
     classes_listbox.focus_set()
 
-    # add_frame has no listbox displaying students
+    # add_frame_package has no listbox displaying students
     if students_listbox is None:
         return
 

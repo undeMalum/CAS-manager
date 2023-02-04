@@ -4,6 +4,7 @@ from tkinter import font
 from cas_managing_db import *
 from tkinter import messagebox
 from tkinter import ttk
+from src import add_frame_package
 from src.frames.main_frame.searching_surname import EntrySurname
 from src.frames.main_frame.students_based_on_surname import search_for_student
 from src.frames.main_frame.go_to_url import go_url
@@ -363,11 +364,11 @@ def main():
 
     # creating widgets inside add frame
     # three 'modes' of this frame
-    add_mode = IntVar(add_frame, 3)
+    add_mode = IntVar(add_frame, add_frame_package.add_modes.AddMode.NEW_STUDENT.value)
     update_class = Radiobutton(
-        add_frame, 
+        add_frame,
         text="Update class", 
-        value=1, 
+        value=1,
         variable=add_mode,
         command=lambda: change_state(
             changing_state_dict["update_class"]
