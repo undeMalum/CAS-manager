@@ -11,7 +11,7 @@ class DisplaySettingsLabelFrame(ttk.LabelFrame):
     def __init__(self, root):
         super().__init__(root, text="Display settings")
 
-        # User can choose by which data (surname or first name)
+        # user can choose by which data (surname or first name)
         # students will be sorted
         self.sorting_element_label = ttk.Label(self, text="Order by:")
         self.sorting_elements = ["surname", "first_name"]
@@ -22,7 +22,7 @@ class DisplaySettingsLabelFrame(ttk.LabelFrame):
         )
         self.sorting_element_combobox.current(0)  # Default: 'surname'
 
-        # User can choose in which order (asc or desc)
+        # user can choose in which order (asc or desc)
         # students will be sorted
         self.sorting_condition_label = ttk.Label(self, text="Alphabetical:")
         self.sorting_conditions = ["A-Z", "Z-A"]  # asc and desc order respectively
@@ -33,7 +33,7 @@ class DisplaySettingsLabelFrame(ttk.LabelFrame):
         )
         self.sorting_condition_combobox.current(0)  # Default: 'A-Z'
 
-        # User can choose from which class
+        # user can choose from which class
         # students will be displayed
         self.class_name_label = ttk.Label(self, text="Class:")
         self.class_name_combobox = ttk.Combobox(
@@ -43,8 +43,13 @@ class DisplaySettingsLabelFrame(ttk.LabelFrame):
         self.provide_values_for_class_names_combobox()
         self.class_name_combobox.current(0)  # Default: '-None-'
 
-        # Manage widgets
+        # manage widgets
         self.position_widgets()
+
+        # set responsiveness
+        for idx in range(5):
+            self.columnconfigure(idx, weight=1)
+        self.rowconfigure(0, weight=1)
 
     def position_widgets(self):
         # Sorting element

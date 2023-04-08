@@ -34,6 +34,11 @@ class ToolsLabelFrame(ttk.LabelFrame):
         # Manage widgets
         self.position_widgets()
 
+        # set responsiveness
+        for idx in range(6):
+            self.columnconfigure(idx, weight=1)
+        self.rowconfigure(0, weight=1)
+
     def position_widgets(self):
         # Search tool
         self.search_label.grid(column=0, row=0, padx=10, pady=10, sticky=tk.E)

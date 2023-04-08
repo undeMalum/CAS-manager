@@ -48,8 +48,10 @@ class RadiobuttonLabelFrame(ttk.LabelFrame):
         # Place radiobuttons insides the radiobutton_label_frame
         self.position_radiobuttons()
 
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
+        # set responsiveness
+        for idx in range(4):
+            self.columnconfigure(idx, weight=1)
+        self.rowconfigure(0, weight=1)
 
     def position_radiobuttons(self):
         """Place radiobuttons insides the radiobutton_label_frame"""

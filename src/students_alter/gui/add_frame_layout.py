@@ -19,8 +19,10 @@ class AddFrame(tk.Frame):
         # Position frames
         self.position_frames()
 
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
+        # set responsiveness
+        self.columnconfigure(0, weight=1)
+        for idx in range(2):
+            self.rowconfigure(idx, weight=1)
 
     def position_frames(self):
         self.modes_frame.grid(column=0, row=0, sticky=tk.NSEW)

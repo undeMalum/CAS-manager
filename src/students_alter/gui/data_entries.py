@@ -10,7 +10,7 @@ class StudentEntriesFrame(tk.Frame):
     def __init__(self, root):
         super().__init__(root)
 
-        # Define entries with descriptions
+        # define entries with descriptions
         self.first_name_label = ttk.Label(self, text="First name:")
         self.first_name_entry = ttk.Entry(self)
 
@@ -20,11 +20,14 @@ class StudentEntriesFrame(tk.Frame):
         self.url_label = ttk.Label(self, text="URL:")
         self.url_entry = ttk.Entry(self)
 
-        # Position widgets
+        # position widgets
         self.position_entries_and_labels()
 
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
+        # set responsiveness
+        for idx in range(4):
+            self.columnconfigure(idx, weight=1)
+        for idx in range(2):
+            self.rowconfigure(idx, weight=1)
 
     def position_entries_and_labels(self):
         self.first_name_label.grid(column=0, row=0, padx=PAD_X, pady=PAD_Y)
@@ -45,17 +48,17 @@ class ClassEntriesFrame(tk.Frame):
         self.class_name_label = ttk.Label(self, text="Class name:")
         self.class_name_entry = ttk.Entry(self)
 
-        # Position widgets
+        # position widgets
         self.position_entries_and_labels()
 
-        self.grid_columnconfigure(0, weight=1)
+        # set responsiveness
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=9)
         self.grid_rowconfigure(0, weight=1)
 
     def position_entries_and_labels(self):
         self.class_name_label.grid(column=0, row=0, padx=PAD_X, pady=PAD_Y, sticky=tk.W)
         self.class_name_entry.grid(column=1, row=0, padx=PAD_X, pady=PAD_Y, sticky=tk.E)
-        self.class_name_label.grid_columnconfigure(0, weight=0)
-        self.class_name_entry.grid_columnconfigure(0, weight=1)
 
 
 class DataEntriesFrame(tk.Frame):
@@ -68,6 +71,10 @@ class DataEntriesFrame(tk.Frame):
         self.frames = dict()
         self.fill_frames_variable()
         self.change_frame(self.students_frame.__class__.__name__)  # by default students frame is set
+
+        # set responsiveness
+        self.columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
 
     def fill_frames_variable(self):
         for frame in (self.students_frame, self.classes_frame):
