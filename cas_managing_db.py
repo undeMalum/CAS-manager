@@ -2,9 +2,11 @@ import sqlite3
 from tkinter import END, Listbox, NORMAL
 
 # creating database with 2 table; classes and students
-DATABASE = "cas_portfolios.db"
+DATABASE = "students_alter.db"
 conn = sqlite3.connect(DATABASE)
 cursor = conn.cursor()
+
+cursor.execute("PRAGMA foreign_keys = ON")
 
 cursor.execute("""CREATE TABLE IF NOT EXISTS classes(
                 class_id INTEGER PRIMARY KEY,
@@ -18,7 +20,7 @@ cursor.execute("""CREATE TABLE IF NOT EXISTS students(
                 class_id INTEGER,
                 url TEXT NOT NULL,
                 FOREIGN KEY (class_id) REFERENCES classes(class_id)
-                );""")
+                ON DELETE CASCADE);""")
 
 conn.close()
 

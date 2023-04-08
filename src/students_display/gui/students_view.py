@@ -1,9 +1,11 @@
 import tkinter as tk
 from tkinter import ttk
 
+from src.students_display.db import fetching_students_from_db
+
 
 class StudentsView(ttk.LabelFrame):
-    def __int__(self, root):
+    def __init__(self, root):
         super().__init__(root)
 
         self.scrollbar = ttk.Scrollbar(self)
@@ -12,6 +14,36 @@ class StudentsView(ttk.LabelFrame):
         self.students_treeview = ttk.Treeview(
             self,
             selectmode="extended",
-            yscrollcommand=self.scrollbar.set,
-            columns=self.columns_name
+            columns=self.columns_name,
+            show="headings"
         )
+
+        # Manage widgets (positioning, interation and data)
+        self.create_headings_for_students_treeview()
+        self.position_widgets()
+        self.connect_treeview_with_scrollbar()
+        self.set_initial_values()
+
+    def position_widgets(self):
+        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.students_treeview.pack(expand=True, fill=tk.BOTH)
+
+    def connect_treeview_with_scrollbar(self):
+        self.students_treeview.config(yscrollcommand=self.scrollbar.set)
+        self.scrollbar.config(command=self.students_treeview.yview)
+
+    def create_headings_for_students_treeview(self):
+        for column in self.columns_name:
+            self.students_treeview.heading(column, text=column, anchor=tk.CENTER)
+
+    def fill_students_treeview(self, values):
+        for students_id, first_name, surname, class_name in values:
+            self.students_treeview.insert("", tk.END, values=(students_id, first_name, surname, class_name))
+
+    def set_initial_values(self):
+        values, info = fetching_students_from_db.get_students("surname", "A-Z", "-None-")
+
+        if info == "Available students":
+            self.fill_students_treeview(values)
+
+        self.config(text=info)
