@@ -33,6 +33,7 @@ class MainWindow(tk.Tk):
         # pre-prepared widgets
         self.view_tools = view_tools.ToolsLabelFrame(self)
         self.view_tools.search_button.configure(command=self.search_student)
+        self.view_tools.delete_button.configure(command=self.remove_from_student_view)
         self.display_settings = display_settings.DisplaySettingsLabelFrame(self)
         self.students_view = students_view.StudentsView(self)
         self.add_frame = add_frame_layout.AddFrame(self)
@@ -157,7 +158,24 @@ class MainWindow(tk.Tk):
         )
 
     def remove_from_student_view(self):
-        pass
+        if self.view_tools.delete_combobox.get() == "student":
+            selected_student = self.students_view.students_treeview.selection()
+            if not selected_student:
+                return tk.messagebox.showerror("Error", "Choose a student!")
+            self.view_tools.remove_student(
+                self.students_view.students_treeview.item(
+                    selected_student[0]
+                )["values"][0]
+            )
+        else:
+            selected_class = self.display_settings.class_name_combobox.get()
+            if selected_class == "-None-":
+                return tk.messagebox.showerror("Error", "Choose a class!")
+            self.view_tools.remove_class(selected_class)
+            self.display_settings.provide_values_for_class_names_combobox()
+            self.display_settings.class_name_combobox.current(0)
+
+        self.alter_students_view()
 
 
 if __name__ == "__main__":

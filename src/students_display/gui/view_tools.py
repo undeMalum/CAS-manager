@@ -1,6 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
 
+from src.students_display.db import (
+    removing_from_db
+)
+
 PAD_X = 5
 PAD_Y = 10
 
@@ -22,7 +26,7 @@ class ToolsLabelFrame(ttk.LabelFrame):
 
         # Delete tool
         self.delete_label = ttk.Label(self, text="Delete:")
-        self.delete_combobox_values = ["students", "class"]
+        self.delete_combobox_values = ["student", "class"]
         self.delete_combobox = ttk.Combobox(
             self,
             state="readonly",
@@ -63,3 +67,11 @@ class ToolsLabelFrame(ttk.LabelFrame):
         self.search_entry.insert(0, text)
         self.search_entry.bind("<FocusIn>", lambda e: self.search_entry.delete(0, tk.END))
         self.search_entry.bind("<FocusOut>", lambda e: self.reset_searching_surname())
+
+    @staticmethod
+    def remove_student(student_id: int):
+        removing_from_db.delete_student(student_id)
+
+    @staticmethod
+    def remove_class(class_name: str):
+        removing_from_db.delete_class(class_name)
