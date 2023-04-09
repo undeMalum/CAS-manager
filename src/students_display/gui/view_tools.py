@@ -14,6 +14,7 @@ class ToolsLabelFrame(ttk.LabelFrame):
         self.search_entry = ttk.Entry(self)
         self.set_defaults_for_search_entry("Enter surname")
 
+        self.store_entry_content = ""
         self.search_button = ttk.Button(self, text="Search")
 
         # Separate the tools
@@ -54,6 +55,7 @@ class ToolsLabelFrame(ttk.LabelFrame):
         self.delete_button.grid(column=6, row=0, padx=10, pady=10, sticky=tk.EW)
 
     def reset_searching_surname(self):
+        self.store_entry_content = self.search_entry.get()
         self.search_entry.delete(0, tk.END)
         self.search_entry.insert(0, "Enter surname")
 

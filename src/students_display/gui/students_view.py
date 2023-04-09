@@ -36,7 +36,16 @@ class StudentsView(ttk.LabelFrame):
         for column in self.columns_name:
             self.students_treeview.heading(column, text=column, anchor=tk.CENTER)
 
+    @staticmethod
+    def fetch_students(sorting_element: str, sorting_order: str, class_name: str, surname="") -> (list[(str, str)], str):
+        return fetching_students_from_db.get_students(sorting_element, sorting_order, class_name, surname)
+
+    def delete_items(self):
+        for child in self.students_treeview.get_children():
+            self.students_treeview.delete(child)
+
     def fill_students_treeview(self, values):
+        self.delete_items()
         for students_id, first_name, surname, class_name in values:
             self.students_treeview.insert("", tk.END, values=(students_id, first_name, surname, class_name))
 

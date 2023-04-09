@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 
 from src.paths.theme_path import (
     THEME_DARK,
@@ -32,6 +32,7 @@ class MainWindow(tk.Tk):
         # create widgets
         # pre-prepared widgets
         self.view_tools = view_tools.ToolsLabelFrame(self)
+        self.view_tools.search_button.configure(command=self.search_student)
         self.display_settings = display_settings.DisplaySettingsLabelFrame(self)
         self.students_view = students_view.StudentsView(self)
         self.add_frame = add_frame_layout.AddFrame(self)
@@ -103,6 +104,27 @@ class MainWindow(tk.Tk):
             self.add_frame.data_entries_frame.students_frame.configure(background="#ffffff")
             self.add_frame.data_entries_frame.classes_frame.configure(background="#ffffff")
             self.style.theme_use("forest-light")
+
+    def search_student(self):
+        surname = self.view_tools.store_entry_content
+        if not surname or surname == "Enter surname":
+            return tk.messagebox.showerror("Error", "Student surname not provided.")
+
+        students, info = self.students_view.fetch_students(
+            self.display_settings.sorting_element_combobox.get(),
+            self.display_settings.sorting_condition_combobox.get(),
+            self.display_settings.class_name_combobox.get(),
+            surname
+        )
+        if info == "Available students":
+            self.students_view.fill_students_treeview(students)
+        else:
+            self.students_view.delete_items()
+
+        self.students_view.configure(text=info)
+
+
+
 
 
 if __name__ == "__main__":
