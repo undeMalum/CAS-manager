@@ -10,6 +10,7 @@ from src.students_display.gui import (
     view_tools,
     display_settings,
     students_view,
+    go_to_url_button
 )
 from src.students_alter.gui import add_frame_layout, update_db_button
 
@@ -47,7 +48,7 @@ class MainWindow(tk.Tk):
             variable=self.theme,
             command=self.switch_theme
         )
-        self.go_to_url_button = ttk.Button(self, text="GO")
+        self.go_to_url_button = go_to_url_button.URLButton(self, command=self.go_url)
 
         # give weight
         self.give_weight()
@@ -142,6 +143,7 @@ class MainWindow(tk.Tk):
         )
 
         self.alter_students_view()
+        self.display_settings.provide_values_for_class_names_combobox()
 
     def set_events_for_display_settings(self):
         self.display_settings.sorting_element_combobox.bind(
@@ -173,9 +175,21 @@ class MainWindow(tk.Tk):
                 return tk.messagebox.showerror("Error", "Choose a class!")
             self.view_tools.remove_class(selected_class)
             self.display_settings.provide_values_for_class_names_combobox()
-            self.display_settings.class_name_combobox.current(0)
 
         self.alter_students_view()
+
+    def go_url(self):
+        selected_student = self.students_view.students_treeview.selection()
+        if not selected_student:
+            return tk.messagebox.showerror("Error", "Choose a student!")
+
+        url = self.go_to_url_button.get_url(
+            self.students_view.students_treeview.item(
+                selected_student[0]
+            )["values"][0]
+        )
+
+        self.go_to_url_button.open_url(url)
 
 
 if __name__ == "__main__":

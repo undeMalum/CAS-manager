@@ -41,7 +41,6 @@ class DisplaySettingsLabelFrame(ttk.LabelFrame):
             state="readonly",
         )
         self.provide_values_for_class_names_combobox()
-        self.class_name_combobox.current(0)  # Default: '-None-'
 
         # manage widgets
         self.position_widgets()
@@ -67,3 +66,4 @@ class DisplaySettingsLabelFrame(ttk.LabelFrame):
     def provide_values_for_class_names_combobox(self):
         values = fetching_classes_from_db.get_class_names()
         self.class_name_combobox.config(values=values)
+        self.class_name_combobox.current(0)

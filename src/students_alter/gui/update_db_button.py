@@ -20,18 +20,29 @@ class UpdateDBButton(ttk.Button):
                         url_entry: ttk.Entry) -> str:
         """Works as an API between GUI and database"""
 
-        if not student_display.selection():
+        selected_student = student_display.selection()
+        if not selected_student and mode not in (1, 2):  # altering classes doesn't require student_display
             return tk.messagebox.showerror("Error", "Choose a student!")
 
         # interact with datab ase
-        map_mode_to_object = db_interaction.create_mode_to_object_dict(
-            class_combobox.get(),
-            class_name_entry.get(),
-            student_display.item(student_display.selection()[0])["values"][0],
-            first_name_entry.get(),
-            surname_entry.get(),
-            url_entry.get()
-        )
+        try:
+            map_mode_to_object = db_interaction.create_mode_to_object_dict(
+                class_combobox.get(),
+                class_name_entry.get(),
+                student_display.item(selected_student[0])["values"][0],
+                first_name_entry.get(),
+                surname_entry.get(),
+                url_entry.get()
+            )
+        except IndexError:  # when altering the class, we don't need student_display
+            map_mode_to_object = db_interaction.create_mode_to_object_dict(
+                class_combobox.get(),
+                class_name_entry.get(),
+                0,
+                first_name_entry.get(),
+                surname_entry.get(),
+                url_entry.get()
+            )
 
         info, description = db_interaction.manage_interaction_with_db(
             mode,
