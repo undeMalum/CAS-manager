@@ -6,10 +6,10 @@ def create_mode_to_object_dict(chosen_class: str, class_name: str, student_id: i
                                first_name: str, surname: str, url: str) -> dict[add_modes.AddMode:tuple]:
     """Create dict that maps object and parameter to an appropriate mode"""
     map_mode_to_object = {
-        add_modes.AddMode.UPDATE_CLASS: (imp.UpdateClass, chosen_class, class_name),
-        add_modes.AddMode.NEW_CLASS: (imp.NewClass, class_name),
-        add_modes.AddMode.UPDATE_STUDENT: (imp.UpdateStudent, student_id, first_name, surname, url, chosen_class),
-        add_modes.AddMode.NEW_STUDENT:  (imp.NewStudent, first_name, surname, url, chosen_class)
+        add_modes.AddMode.UPDATE_CLASS.value: (imp.UpdateClass, chosen_class, class_name),
+        add_modes.AddMode.NEW_CLASS.value: (imp.NewClass, class_name),
+        add_modes.AddMode.UPDATE_STUDENT.value: (imp.UpdateStudent, student_id, first_name, surname, url, chosen_class),
+        add_modes.AddMode.NEW_STUDENT.value:  (imp.NewStudent, first_name, surname, url, chosen_class)
     }
     return map_mode_to_object
 

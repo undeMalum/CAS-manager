@@ -11,7 +11,7 @@ from src.students_display.gui import (
     display_settings,
     students_view,
 )
-from src.students_alter.gui import add_frame_layout
+from src.students_alter.gui import add_frame_layout, update_db_button
 
 PAD_X = 10
 PAD_Y = 10
@@ -36,6 +36,7 @@ class MainWindow(tk.Tk):
         self.display_settings = display_settings.DisplaySettingsLabelFrame(self)
         self.students_view = students_view.StudentsView(self)
         self.add_frame = add_frame_layout.AddFrame(self)
+        self.update_db_button = update_db_button.UpdateDBButton(self, command=self.confirm_update)
         # new widgets
         self.theme = tk.IntVar(self)
         self.theme_switcher = ttk.Checkbutton(
@@ -46,13 +47,15 @@ class MainWindow(tk.Tk):
             command=self.switch_theme
         )
         self.go_to_url_button = ttk.Button(self, text="GO")
-        self.update_db_button = ttk.Button(self, text="Confirm")
 
         # give weight
         self.give_weight()
 
         # display all widgets
         self.position_widgets()
+
+        # make display settings alter the student view section
+        self.set_events_for_display_settings()
 
         # position the window
         self.update()
@@ -105,11 +108,7 @@ class MainWindow(tk.Tk):
             self.add_frame.data_entries_frame.classes_frame.configure(background="#ffffff")
             self.style.theme_use("forest-light")
 
-    def search_student(self):
-        surname = self.view_tools.store_entry_content
-        if not surname or surname == "Enter surname":
-            return tk.messagebox.showerror("Error", "Student surname not provided.")
-
+    def alter_students_view(self, surname: str = ""):
         students, info = self.students_view.fetch_students(
             self.display_settings.sorting_element_combobox.get(),
             self.display_settings.sorting_condition_combobox.get(),
@@ -123,8 +122,42 @@ class MainWindow(tk.Tk):
 
         self.students_view.configure(text=info)
 
+    def search_student(self):
+        surname = self.view_tools.store_entry_content
+        if not surname or surname == "Enter surname":
+            return tk.messagebox.showerror("Error", "Student surname not provided.")
 
+        self.alter_students_view(surname)
 
+    def confirm_update(self):
+        self.update_db_button.choose_mode_add(
+            self.add_frame.modes_frame.mode.get(),
+            self.display_settings.class_name_combobox,
+            self.add_frame.data_entries_frame.classes_frame.class_name_entry,
+            self.students_view.students_treeview,
+            self.add_frame.data_entries_frame.students_frame.first_name_entry,
+            self.add_frame.data_entries_frame.students_frame.surname_entry,
+            self.add_frame.data_entries_frame.students_frame.url_entry
+        )
+
+        self.alter_students_view()
+
+    def set_events_for_display_settings(self):
+        self.display_settings.sorting_element_combobox.bind(
+            "<<ComboboxSelected>>",
+            lambda e: self.alter_students_view()
+        )
+        self.display_settings.sorting_condition_combobox.bind(
+            "<<ComboboxSelected>>",
+            lambda e: self.alter_students_view()
+        )
+        self.display_settings.class_name_combobox.bind(
+            "<<ComboboxSelected>>",
+            lambda e: self.alter_students_view()
+        )
+
+    def remove_from_student_view(self):
+        pass
 
 
 if __name__ == "__main__":

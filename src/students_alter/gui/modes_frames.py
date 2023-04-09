@@ -16,32 +16,32 @@ class RadiobuttonLabelFrame(ttk.LabelFrame):
         # Variable for communicating radiobuttons (modes)
         self.mode = tk.IntVar(
             self,
-            add_modes.AddMode.NEW_STUDENT
+            add_modes.AddMode.NEW_STUDENT.value
         )
 
         # Define raddiobuttons (modes) insides the frame
         self.add_student_radiobutton = ttk.Radiobutton(
             self,
             text="Add student",
-            value=add_modes.AddMode.NEW_STUDENT,
+            value=add_modes.AddMode.NEW_STUDENT.value,
             variable=self.mode
         )
         self.update_student_radiobutton = ttk.Radiobutton(
             self,
             text="Update student",
-            value=add_modes.AddMode.UPDATE_STUDENT,
+            value=add_modes.AddMode.UPDATE_STUDENT.value,
             variable=self.mode
         )
         self.add_class_radiobutton = ttk.Radiobutton(
             self,
             text="Add class",
-            value=add_modes.AddMode.NEW_CLASS,
+            value=add_modes.AddMode.NEW_CLASS.value,
             variable=self.mode
         )
         self.update_class_radiobutton = ttk.Radiobutton(
             self,
             text="Update class",
-            value=add_modes.AddMode.UPDATE_CLASS,
+            value=add_modes.AddMode.UPDATE_CLASS.value,
             variable=self.mode
         )
 
