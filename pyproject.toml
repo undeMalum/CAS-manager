@@ -1,0 +1,23 @@
+[project]
+name = "cas-manager"
+version = "0.0.1"
+description = "A software application for IBDP CAS coordinators."
+readme = "README.md"
+authors = [{ name = "undeMalum", email = "polakwmc@gazeta.pl" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["cas", "manager"]
+requires-python = ">=3.10"
+
+    [project.optional-dependencies]
+    dev   = ["pytest"]
+
+    [project.scripts]
+    csv_sqlite_converter = "src.main.main:main"
+
+    [project.urls]
+    repository    = "https://github.com/undeMalum/CAS-manager"
