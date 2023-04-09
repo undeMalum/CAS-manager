@@ -1,4 +1,4 @@
-from src.custom_managers import db_manager
+from src.database_management import db_manager
 
 # Semicolon since it goes at the end
 convert_gui_str_to_sql_asc_desc = {

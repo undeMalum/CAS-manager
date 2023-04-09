@@ -64,7 +64,7 @@ class MainWindow(tk.Tk):
         self.minsize(self.winfo_width(), self.winfo_height())
         x = self.winfo_screenwidth() // 2 - self.winfo_width() // 2
         y = self.winfo_screenheight() // 2 - self.winfo_height() // 2
-        self.geometry(f"+{x}+{y}")
+        self.geometry(f"{self.winfo_width()}x{self.winfo_height()}+{x}+{y}")
 
         # set default theme
         self.switch_theme()
@@ -82,24 +82,18 @@ class MainWindow(tk.Tk):
     def position_widgets(self):
         # pre-prepared widgets
         self.view_tools.grid(column=0, row=1, padx=PAD_X, pady=(0, PAD_Y), sticky=tk.NSEW)
-
         self.display_settings.grid(column=0, row=2, padx=PAD_X, pady=PAD_Y, sticky=tk.NSEW)
-
         self.students_view.grid(column=0, row=3, padx=PAD_X, pady=PAD_Y, sticky=tk.NSEW)
-
         self.add_frame.grid(column=1, row=3, padx=PAD_X, pady=PAD_Y, sticky=tk.NSEW)
 
         # new widgets
         self.theme_switcher.grid(column=0, row=4, padx=PAD_X, pady=PAD_Y, sticky=tk.NSEW)
-
         self.go_to_url_button.grid(column=0, row=4, padx=PAD_X, pady=PAD_Y, sticky=tk.NSEW)
-
         self.update_db_button.grid(column=1, row=4, padx=PAD_X, pady=PAD_Y, sticky=tk.NSEW)
-
         self.theme_switcher.grid(column=0, row=0, padx=PAD_X, sticky=tk.NSEW)
 
     def switch_theme(self):
-        if self.theme.get() == 0:
+        if not self.theme.get():
             self.configure(background="#313131")
             self.add_frame.data_entries_frame.students_frame.configure(background="#313131")
             self.add_frame.data_entries_frame.classes_frame.configure(background="#313131")
@@ -111,6 +105,8 @@ class MainWindow(tk.Tk):
             self.style.theme_use("forest-light")
 
     def alter_students_view(self, surname: str = ""):
+        """Function that changes the content of the student view treeview
+        as well as the label of the surrounding label frame if required."""
         students, info = self.students_view.fetch_students(
             self.display_settings.sorting_element_combobox.get(),
             self.display_settings.sorting_condition_combobox.get(),
@@ -125,6 +121,7 @@ class MainWindow(tk.Tk):
         self.students_view.configure(text=info)
 
     def search_student(self):
+        """Function that looks for a student based on the provided surname."""
         surname = self.view_tools.store_entry_content
         if not surname or surname == "Enter surname":
             return tk.messagebox.showerror("Error", "Student surname not provided.")
@@ -132,6 +129,7 @@ class MainWindow(tk.Tk):
         self.alter_students_view(surname)
 
     def confirm_update(self):
+        """Function that alters db based on the input from the add frame."""
         self.update_db_button.choose_mode_add(
             self.add_frame.modes_frame.mode.get(),
             self.display_settings.class_name_combobox,
@@ -142,8 +140,8 @@ class MainWindow(tk.Tk):
             self.add_frame.data_entries_frame.students_frame.url_entry
         )
 
-        self.alter_students_view()
         self.display_settings.provide_values_for_class_names_combobox()
+        self.alter_students_view()
 
     def set_events_for_display_settings(self):
         self.display_settings.sorting_element_combobox.bind(
@@ -160,6 +158,7 @@ class MainWindow(tk.Tk):
         )
 
     def remove_from_student_view(self):
+        """Function that removes either individual students or entire class of students."""
         if self.view_tools.delete_combobox.get() == "student":
             selected_student = self.students_view.students_treeview.selection()
             if not selected_student:
@@ -192,6 +191,10 @@ class MainWindow(tk.Tk):
         self.go_to_url_button.open_url(url)
 
 
-if __name__ == "__main__":
+def main():
     main_window = MainWindow()
     main_window.mainloop()
+
+
+if __name__ == "__main__":
+    main()

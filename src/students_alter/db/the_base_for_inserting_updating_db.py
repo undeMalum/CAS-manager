@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.custom_managers import db_manager
+from src.database_management import db_manager
 
 
 class AlterDB(ABC):

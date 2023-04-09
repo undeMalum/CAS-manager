@@ -1,4 +1,4 @@
-from src.custom_managers import db_manager
+from src.database_management import db_manager
 from tests.students_display.fetching_predicted_values.prompts import (
     prompt_students_from_class_asc,
     prompt_students_from_class_desc,

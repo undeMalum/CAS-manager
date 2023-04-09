@@ -1,4 +1,4 @@
-from src.custom_managers import db_manager
+from src.database_management import db_manager
 
 
 def fetch_class_names_from_db() -> list[tuple[str]]:

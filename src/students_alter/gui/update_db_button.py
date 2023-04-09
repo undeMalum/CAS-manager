@@ -21,7 +21,7 @@ class UpdateDBButton(ttk.Button):
         """Works as an API between GUI and database"""
 
         selected_student = student_display.selection()
-        if not selected_student and mode not in (1, 2):  # altering classes doesn't require student_display
+        if not selected_student and mode not in (1, 2, 4):  # altering classes doesn't require student_display
             return tk.messagebox.showerror("Error", "Choose a student!")
 
         # interact with datab ase

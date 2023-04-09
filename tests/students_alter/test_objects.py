@@ -4,7 +4,7 @@ from src.students_alter.db.inserting_updating_interacting_with_db import (manage
                                                                           create_mode_to_object_dict)
 import src.students_alter.db.implementing_alter_abc as imp
 from src.students_alter.add_modes import AddMode
-from src.custom_managers import db_manager
+from src.database_management import db_manager
 
 
 @pytest.mark.dbalteration

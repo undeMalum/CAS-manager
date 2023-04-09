@@ -1,4 +1,4 @@
-from src.custom_managers import db_manager
+from src.database_management import db_manager
 from tests.students_display.fetching_predicted_values.prompts import (
     prompt_given_class_doesnt_exist_first_name_asc,
     prompt_given_class_doesnt_exist_first_name_desc

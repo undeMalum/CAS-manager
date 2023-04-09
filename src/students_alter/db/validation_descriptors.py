@@ -1,6 +1,6 @@
 from requests import get, exceptions
 
-from src.custom_managers import db_manager
+from src.database_management import db_manager
 
 
 def exists_in_db(value: (str,), column: str = "class_name") -> bool:
@@ -58,5 +58,5 @@ class UpdatingNameExists(ValidationTemplate):
     """Make sure that the user chose class, that is, the old_class_name was chosen"""
     def __set__(self, instance, value):
         if not exists_in_db(value):
-            raise ValueError("Choose class to be updated!") from None
+            raise ValueError("Choose class!") from None
         instance.__dict__[self.name] = value

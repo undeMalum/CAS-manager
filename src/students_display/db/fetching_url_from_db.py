@@ -1,4 +1,4 @@
-from src.custom_managers import db_manager
+from src.database_management import db_manager
 
 
 def fetch_url(student_id: int) -> str:
