@@ -12,7 +12,7 @@ style = ttk.Style(root)
 # Import the tcl file
 root.tk.call("source", THEME_DARK)
 
-# Set the theme with the theme_use method
+# Set the Forest-ttk-theme with the theme_use method
 style.theme_use("forest-dark")
 add_frame = DisplaySettingsLabelFrame(root)
 add_frame.pack()

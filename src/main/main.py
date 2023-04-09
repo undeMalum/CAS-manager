@@ -28,7 +28,7 @@ class MainWindow(tk.Tk):
         self.style = ttk.Style(self)  # Create a style
         self.tk.call("source", THEME_DARK)  # Import the tcl file dark
         self.tk.call("source", THEME_LIGHT)  # Import the tcl file light
-        self.style.theme_use("forest-dark")  # Set the theme with the theme_use method
+        self.style.theme_use("forest-dark")  # Set the Forest-ttk-theme with the theme_use method
 
         # create widgets
         # pre-prepared widgets
@@ -44,7 +44,7 @@ class MainWindow(tk.Tk):
         self.theme_switcher = ttk.Checkbutton(
             self,
             style="Switch",
-            text="Switch theme",
+            text="Switch Forest-ttk-theme",
             variable=self.theme,
             command=self.switch_theme
         )
@@ -66,7 +66,7 @@ class MainWindow(tk.Tk):
         y = self.winfo_screenheight() // 2 - self.winfo_height() // 2
         self.geometry(f"{self.winfo_width()}x{self.winfo_height()}+{x}+{y}")
 
-        # set default theme
+        # set default Forest-ttk-theme
         self.switch_theme()
 
     def give_weight(self):
