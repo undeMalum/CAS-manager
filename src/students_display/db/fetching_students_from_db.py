@@ -6,54 +6,41 @@ convert_gui_str_to_sql_asc_desc = {
     "Z-A": "DESC;"
 }
 
-# See the docstring for construct_dict_key
-where_clause_dict = {
-    "without_class-without_surname": "",
-    "with_class-without_surname": "WHERE class_name = (:class_name)",
-    "with_class-with_surname": "WHERE class_name = (:class_name) AND surname = (:surname)",
-    "without_class-with_surname": "WHERE surname = (:surname)"
-}
 
+def construct_dict_key(class_name: str, surname: str) -> (str, str):
+    """
+    Created search condition.
 
-def construct_dict_key(class_name: str, surname: str) -> str:
-    """This functions creates a key to look up in where_clause dictionary.
-    This is because all required queries differ only in where clause and hence
-    it is pointless to create a dictionary with entire queries as items since it
-    would lead to unnecessary redundancy.
+    Checks whether any class was given or not. If so, it adds search for class name
+    to the condition.
 
-    Moreover, the choice of an appropriate query depends only on whether
-    the values for class_name and surname were given or not and actual values
-    doesn't matter at all.
+    Same with surname. Checks whether any surname was given or not. If so, it adds
+    search for surname pattern to the condition.
 
-    Taking advantage of that fact, the following query makes a test to ensure
-    that the values for class_name and surname were provided (ie chosen by
-    the user).
-
-    This creates outputs:
-
-    1. class_name = "-None-", surname = "" --> "without_class-without_surname"
-
-    2. class_name = "IIIA", surname = "" --> "with_class-without_surname"
-
-    3. class_name = "IIIA", surname = "Bolly" --> "with_class-with_surname"
-
-    4. class_name = "-None-", surname = "Bolly" --> "without_class-with_surname"
+    If none of the above condition is satisfied, returns and empty string.
     """
 
-    with_class, with_surname = "with_class", "with_surname"
+    and_needed_dict = {True: "AND", False: ""}
+    and_needed = True
+
+    with_class, with_surname = "class_name = (:class_name)", f"surname LIKE '{surname}%'"
     if class_name == "-None-":
-        with_class = "without_class"
+        and_needed = False
+        with_class = ""
     if not surname:
-        with_surname = "without_surname"
+        and_needed = False
+        with_surname = ""
 
-    return f"{with_class}-{with_surname}"
+    condition = f"{with_class} {and_needed_dict[and_needed]} {with_surname}"  # construct temp condition
+
+    return f"WHERE {condition}" if with_class or with_surname else ""  # if condition is needed, add where clause
 
 
-def construct_query_for_fetching_students(sorting_element: str, sorting_order: str, where_clause_key: str) -> str:
+def construct_query_for_fetching_students(sorting_element: str, sorting_order: str, where_clause: str) -> str:
     """
-    1. where_clause_dict[where_clause_key]
-        Queries differ only by where clause they have
-        (see the docstring for construct_dict_key).
+    1. where_clause
+        Insert search condition if needed. Depends on
+        the user input.
 
     2. convert_gui_str_to_sql_asc_desc[sorting_order]
         User can choose if he/she wants to display
@@ -69,7 +56,7 @@ def construct_query_for_fetching_students(sorting_element: str, sorting_order: s
     FROM students
     INNER JOIN classes 
     ON students.class_id = classes.class_id
-    {where_clause_dict[where_clause_key]}
+    {where_clause}
     ORDER BY {sorting_element}
     {convert_gui_str_to_sql_asc_desc[sorting_order]}
     """
@@ -81,15 +68,14 @@ def get_students(sorting_element: str, sorting_order: str, class_name: str, surn
     """Fetches students from db to display in ttk.Treeview"""
     # Data for SQL query
     data = {
-        "class_name": class_name,
-        "surname": surname
+        "class_name": class_name
     }
 
     # The appropriate where clause for constructing the query
-    where_clause_key = construct_dict_key(class_name, surname)
+    where_clause = construct_dict_key(class_name, surname)
 
     # Construct query
-    prompt = construct_query_for_fetching_students(sorting_element, sorting_order, where_clause_key)
+    prompt = construct_query_for_fetching_students(sorting_element, sorting_order, where_clause)
 
     # Handle connection with the db
     with db_manager.SQLite() as cur:
@@ -103,3 +89,8 @@ def get_students(sorting_element: str, sorting_order: str, class_name: str, surn
         info = "Available students" if chosen_students else "No students available"
 
         return chosen_students, info
+
+
+if __name__ == "__main__":
+    concant = construct_dict_key("-None-", "")
+    print(concant)

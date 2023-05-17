@@ -44,7 +44,7 @@ class MainWindow(tk.Tk):
         self.theme_switcher = ttk.Checkbutton(
             self,
             style="Switch",
-            text="Switch Forest-ttk-theme",
+            text="Switch theme",
             variable=self.theme,
             command=self.switch_theme
         )
