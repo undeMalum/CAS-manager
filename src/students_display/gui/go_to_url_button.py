@@ -10,9 +10,10 @@ class URLButton(ttk.Button):
         super().__init__(root, text="GO", *args, **kwargs)
 
     @staticmethod
-    def open_url(url: str):
-        webbrowser.open(url)
+    def open_url(urls: list[str]):
+        for url in urls:
+            webbrowser.open(url)
 
     @staticmethod
-    def get_url(student_id: int):
+    def get_url(student_id: list[int]):
         return fetching_url_from_db.fetch_url(student_id)

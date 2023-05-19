@@ -23,6 +23,8 @@ class UpdateDBButton(ttk.Button):
         selected_student = student_display.selection()
         if not selected_student and mode not in (1, 2, 4):  # altering classes doesn't require student_display
             return tk.messagebox.showerror("Error", "Choose a student!")
+        elif len(selected_student) > 1:
+            return tk.messagebox.showerror("Error", "Choose only one student!")
 
         # interact with datab ase
         try:

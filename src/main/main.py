@@ -178,14 +178,13 @@ class MainWindow(tk.Tk):
         self.alter_students_view()
 
     def go_url(self):
-        selected_student = self.students_view.students_treeview.selection()
-        if not selected_student:
+        selected_students = self.students_view.students_treeview.selection()
+        if not selected_students:
             return tk.messagebox.showerror("Error", "Choose a student!")
 
         url = self.go_to_url_button.get_url(
-            self.students_view.students_treeview.item(
-                selected_student[0]
-            )["values"][0]
+            [self.students_view.students_treeview.item(selected_student)["values"][0]
+             for selected_student in selected_students]
         )
 
         self.go_to_url_button.open_url(url)

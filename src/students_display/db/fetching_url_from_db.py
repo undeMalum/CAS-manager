@@ -1,11 +1,14 @@
 from src.database_management import db_manager
 
 
-def fetch_url(student_id: int) -> str:
+def fetch_url(students_id: list[int]) -> list[str]:
     prompt = "SELECT url FROM students WHERE student_id = (:student_id)"
-    data = {"student_id": student_id}
 
     with db_manager.SQLite() as cur:
-        cur.execute(prompt, data)
+        ids = []
+        for student_id in students_id:
+            data = {"student_id": student_id}
+            cur.execute(prompt, data)
+            ids.append(cur.fetchone()[0])
 
-        return cur.fetchone()[0]
+        return ids
