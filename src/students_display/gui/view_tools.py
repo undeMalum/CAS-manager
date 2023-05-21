@@ -14,7 +14,7 @@ class ToolsLabelFrame(ttk.LabelFrame):
         super().__init__(root, text="Tools")
 
         # Search tool (by surname)
-        self.search_label = ttk.Label(self, text="Search students:")
+        self.search_label = ttk.Label(self, text="Search student(s):")
         self.search_entry = ttk.Entry(self)
         self.set_defaults_for_search_entry("Enter surname")
 
@@ -26,7 +26,7 @@ class ToolsLabelFrame(ttk.LabelFrame):
 
         # Delete tool
         self.delete_label = ttk.Label(self, text="Delete:")
-        self.delete_combobox_values = ["student", "class"]
+        self.delete_combobox_values = ["student(s)", "class"]
         self.delete_combobox = ttk.Combobox(
             self,
             state="readonly",
@@ -69,8 +69,8 @@ class ToolsLabelFrame(ttk.LabelFrame):
         self.search_entry.bind("<FocusOut>", lambda e: self.reset_searching_surname())
 
     @staticmethod
-    def remove_student(student_id: int):
-        removing_from_db.delete_student(student_id)
+    def remove_student(students_id: list[int]):
+        removing_from_db.delete_student(students_id)
 
     @staticmethod
     def remove_class(class_name: str):

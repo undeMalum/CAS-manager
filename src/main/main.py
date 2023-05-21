@@ -157,25 +157,44 @@ class MainWindow(tk.Tk):
             lambda e: self.alter_students_view()
         )
 
-    def remove_from_student_view(self):
+    @staticmethod
+    def confirm_deletion() -> bool:
+        answer = tk.messagebox.askyesno(
+            title="Confirm deletion",
+            message="Do you want to delete?",
+            icon=tk.messagebox.WARNING
+        )
+
+        return answer
+
+    def remove_from_student_view(self) -> str:
         """Function that removes either individual students or entire class of students."""
+
         if self.view_tools.delete_combobox.get() == "student":
-            selected_student = self.students_view.students_treeview.selection()
-            if not selected_student:
+            selected_students = self.students_view.students_treeview.selection()
+            if not selected_students:
                 return tk.messagebox.showerror("Error", "Choose a student!")
+
+            if not self.confirm_deletion():
+                return tk.messagebox.showinfo("Status", "Deletion aborted")
+
             self.view_tools.remove_student(
-                self.students_view.students_treeview.item(
-                    selected_student[0]
-                )["values"][0]
+                [self.students_view.students_treeview.item(selected_student)["values"][0]
+                 for selected_student in selected_students]
             )
         else:
             selected_class = self.display_settings.class_name_combobox.get()
             if selected_class == "-None-":
                 return tk.messagebox.showerror("Error", "Choose a class!")
+
+            if not self.confirm_deletion():
+                return tk.messagebox.showinfo("Status", "Deletion aborted")
+
             self.view_tools.remove_class(selected_class)
             self.display_settings.provide_values_for_class_names_combobox()
 
         self.alter_students_view()
+        return tk.messagebox.showinfo("Status", "Operation completed successfully.")
 
     def go_url(self):
         selected_students = self.students_view.students_treeview.selection()
