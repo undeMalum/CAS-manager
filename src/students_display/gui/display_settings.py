@@ -46,7 +46,7 @@ class DisplaySettingsLabelFrame(ttk.LabelFrame):
         self.position_widgets()
 
         # set responsiveness
-        for idx in range(5):
+        for idx in range(6):
             self.columnconfigure(idx, weight=1)
         self.rowconfigure(0, weight=1)
 

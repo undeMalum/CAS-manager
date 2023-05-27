@@ -40,7 +40,7 @@ class ToolsLabelFrame(ttk.LabelFrame):
         self.position_widgets()
 
         # set responsiveness
-        for idx in range(6):
+        for idx in range(7):
             self.columnconfigure(idx, weight=1)
         self.rowconfigure(0, weight=1)
 

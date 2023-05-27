@@ -49,7 +49,7 @@ class RadiobuttonLabelFrame(ttk.LabelFrame):
         self.position_radiobuttons()
 
         # set responsiveness
-        for idx in range(4):
+        for idx in range(8):
             self.columnconfigure(idx, weight=1)
         self.rowconfigure(0, weight=1)
 
