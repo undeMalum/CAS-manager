@@ -17,7 +17,7 @@ def create_database(database_name):
     cursor.execute("""CREATE TABLE IF NOT EXISTS students(
                     student_id INTEGER PRIMARY KEY,
                     first_name TEXT NOT NULL,
-                    surname TEXT NOT NULL,
+                    surname TEXT NOT NULL COLLATE NOCASE,
                     class_id INTEGER,
                     url TEXT NOT NULL,
                     FOREIGN KEY (class_id) REFERENCES classes(class_id)
