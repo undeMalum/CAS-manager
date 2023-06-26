@@ -95,13 +95,19 @@ class MainWindow(tk.Tk):
     def switch_theme(self):
         if not self.theme.get():
             self.configure(background="#313131")
-            self.add_frame.data_entries_frame.students_frame.configure(background="#313131")
-            self.add_frame.data_entries_frame.classes_frame.configure(background="#313131")
+            self.add_frame.modes_notebook.class_entries_update.configure(background="#313131")
+            self.add_frame.modes_notebook.class_entries_add.configure(background="#313131")
+            self.add_frame.modes_notebook.students_entries_add.configure(background="#313131")
+            self.add_frame.modes_notebook.students_entries_update.configure(background="#313131")
             self.style.theme_use("forest-dark")
         else:
             self.configure(background="#ffffff")
             self.add_frame.data_entries_frame.students_frame.configure(background="#ffffff")
             self.add_frame.data_entries_frame.classes_frame.configure(background="#ffffff")
+            self.add_frame.modes_notebook.class_entries_update.configure(background="#ffffff")
+            self.add_frame.modes_notebook.class_entries_add.configure(background="#ffffff")
+            self.add_frame.modes_notebook.students_entries_add.configure(background="#ffffff")
+            self.add_frame.modes_notebook.students_entries_update.configure(background="#ffffff")
             self.style.theme_use("forest-light")
 
     def alter_students_view(self, surname: str = ""):
