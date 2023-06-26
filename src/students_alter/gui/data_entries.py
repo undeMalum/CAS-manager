@@ -61,28 +61,28 @@ class ClassEntriesFrame(tk.Frame):
         self.class_name_entry.grid(column=1, row=0, padx=PAD_X, pady=PAD_Y, sticky=tk.E)
 
 
-class DataEntriesFrame(tk.Frame):
-    def __init__(self, root):
-        super().__init__(root, highlightbackground="#595959", highlightthickness=1)
-
-        self.students_frame = StudentEntriesFrame(self)
-        self.classes_frame = ClassEntriesFrame(self)
-
-        self.frames = dict()
-        self.fill_frames_variable()
-        self.change_frame(self.students_frame.__class__.__name__)  # by default students frame is set
-
-        # set responsiveness
-        self.columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
-
-    def fill_frames_variable(self):
-        for frame in (self.students_frame, self.classes_frame):
-            frame_name = frame.__class__.__name__
-            self.frames[frame_name] = frame
-            frame.grid(row=0, column=0, sticky=tk.NSEW)
-            # frame.grid_columnconfigure(0, weight=1)
-
-    def change_frame(self, name):
-        frame = self.frames[name]
-        frame.tkraise()
+# class DataEntriesFrame(tk.Frame):
+#     def __init__(self, root):
+#         super().__init__(root, highlightbackground="#595959", highlightthickness=1)
+#
+#         self.students_frame = StudentEntriesFrame(self)
+#         self.classes_frame = ClassEntriesFrame(self)
+#
+#         self.frames = dict()
+#         self.fill_frames_variable()
+#         self.change_frame(self.students_frame.__class__.__name__)  # by default students frame is set
+#
+#         # set responsiveness
+#         self.columnconfigure(0, weight=1)
+#         self.grid_rowconfigure(0, weight=1)
+#
+#     def fill_frames_variable(self):
+#         for frame in (self.students_frame, self.classes_frame):
+#             frame_name = frame.__class__.__name__
+#             self.frames[frame_name] = frame
+#             frame.grid(row=0, column=0, sticky=tk.NSEW)
+#             # frame.grid_columnconfigure(0, weight=1)
+#
+#     def change_frame(self, name):
+#         frame = self.frames[name]
+#         frame.tkraise()
