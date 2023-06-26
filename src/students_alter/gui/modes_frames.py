@@ -14,19 +14,27 @@ class ModesNotebook(ttk.Notebook):
 
         # Define Tabs inside the ModesNotebook
         self.add_class = ttk.Frame(self)
+        self.add(self.add_class, text="Add class")
         self.update_class = ttk.Frame(self)
+        self.add(self.update_class, text="Update class")
         self.add_student = ttk.Frame(self)
+        self.add(self.add_student, text="Add student")
         self.update_student = ttk.Frame(self)
+        self.add(self.update_student, text="Update student")
 
         # Give weight to Tabs
         self.give_weight()
 
         # Give functionalities to Tabs
-        self.students_entries_add = data_entries.StudentEntriesFrame(self.add_student)
-        self.students_entries_update = data_entries.StudentEntriesFrame(self.update_student)
+        self.class_entries_add = data_entries.ClassEntriesFrame(self.add_class)
+        self.class_entries_add.grid(row=0, column=0)
+        self.class_entries_update = data_entries.ClassEntriesFrame(self.update_class)
+        self.class_entries_update.grid(row=0, column=0)
 
         self.students_entries_add = data_entries.StudentEntriesFrame(self.add_student)
+        self.students_entries_add.grid(row=0, column=0)
         self.students_entries_update = data_entries.StudentEntriesFrame(self.update_student)
+        self.students_entries_update.grid(row=0, column=0)
 
     def give_weight(self):
         self.add_class.columnconfigure(index=0, weight=1)
@@ -39,55 +47,20 @@ class ModesNotebook(ttk.Notebook):
         self.update_student.rowconfigure(index=0, weight=1)
 
 
-# class RadiobuttonLabelFrame(ttk.LabelFrame):
-#     """Frame that hold all radiobuttons (modes) together"""
-#     def __init__(self, root):
-#         super().__init__(root)
-#         self["text"] = "Choose mode"
-#
-#         # Variable for communicating radiobuttons (modes)
-#         self.mode = tk.IntVar(
-#             self,
-#             add_modes.AddMode.NEW_STUDENT.value
-#         )
-#
-#         # Define raddiobuttons (modes) insides the frame
-#         self.add_student_radiobutton = ttk.Radiobutton(
-#             self,
-#             text="Add student",
-#             value=add_modes.AddMode.NEW_STUDENT.value,
-#             variable=self.mode
-#         )
-#         self.update_student_radiobutton = ttk.Radiobutton(
-#             self,
-#             text="Update student",
-#             value=add_modes.AddMode.UPDATE_STUDENT.value,
-#             variable=self.mode
-#         )
-#         self.add_class_radiobutton = ttk.Radiobutton(
-#             self,
-#             text="Add class",
-#             value=add_modes.AddMode.NEW_CLASS.value,
-#             variable=self.mode
-#         )
-#         self.update_class_radiobutton = ttk.Radiobutton(
-#             self,
-#             text="Update class",
-#             value=add_modes.AddMode.UPDATE_CLASS.value,
-#             variable=self.mode
-#         )
-#
-#         # Place radiobuttons insides the radiobutton_label_frame
-#         self.position_radiobuttons()
-#
-#         # set responsiveness
-#         for idx in range(8):
-#             self.columnconfigure(idx, weight=1)
-#         self.rowconfigure(0, weight=1)
-#
-#     def position_radiobuttons(self):
-#         """Place radiobuttons insides the radiobutton_label_frame"""
-#         self.add_student_radiobutton.grid(column=0, row=0, padx=PAD_X, pady=PAD_Y)
-#         self.update_student_radiobutton.grid(column=1, row=0, padx=PAD_X, pady=PAD_Y)
-#         self.add_class_radiobutton.grid(column=2, row=0, padx=PAD_X, pady=PAD_Y)
-#         self.update_class_radiobutton.grid(column=3, row=0, padx=PAD_X, pady=PAD_Y)
+if __name__ == "__main__":
+    from src.paths.theme_path import THEME_DARK
+
+    root = tk.Tk()
+    root.geometry("500x200")
+    # Create a style
+    style = ttk.Style(root)
+
+    # Import the tcl file
+    root.tk.call("source", THEME_DARK)
+
+    # Set the Forest-ttk-theme with the theme_use method
+    style.theme_use("forest-dark")
+    add_frame = ModesNotebook(root)
+    add_frame.pack()
+
+    root.mainloop()
