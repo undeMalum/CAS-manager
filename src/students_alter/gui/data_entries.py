@@ -1,11 +1,23 @@
 import tkinter as tk
 from tkinter import ttk
 
+from abc import ABC, abstractmethod
+
 PAD_X = 10
 PAD_Y = 10
 
 
-class StudentEntriesFrame(tk.Frame):
+class DataEntries(ABC):
+    @abstractmethod
+    def return_entries_values(self):
+        pass
+
+    @abstractmethod
+    def erase(self):
+        pass
+
+
+class StudentEntriesFrame(ttk.Frame, DataEntries):
     """Manages frame for creating/updating a student record"""
     def __init__(self, root, *args, **kwargs):
         super().__init__(root, *args, **kwargs)
@@ -39,8 +51,17 @@ class StudentEntriesFrame(tk.Frame):
         self.url_label.grid(column=0, row=1, padx=PAD_X, pady=PAD_Y)
         self.url_entry.grid(column=1, row=1, columnspan=3, padx=PAD_X, pady=PAD_Y, sticky=tk.EW)
 
+    def return_entries_values(self):
+        return self.first_name_entry.get(), self.surname_entry.get(), self.url_entry.get()
 
-class ClassEntriesFrame(tk.Frame):
+    def erase(self) -> None:
+        """Remove text from widgets"""
+        self.first_name_entry.delete(0, tk.END)
+        self.surname_entry.delete(0, tk.END)
+        self.url_entry.delete(0, tk.END)
+
+
+class ClassEntriesFrame(ttk.Frame, DataEntries):
     """Manages frame for creating/updating a class record"""
 
     def __init__(self, root, *args, **kwargs):
@@ -60,3 +81,10 @@ class ClassEntriesFrame(tk.Frame):
     def position_entries_and_labels(self):
         self.class_name_label.grid(column=0, row=0, padx=PAD_X, pady=PAD_Y, sticky=tk.W)
         self.class_name_entry.grid(column=1, row=0, padx=PAD_X, pady=PAD_Y, sticky=tk.E)
+
+    def return_entries_values(self):
+        return self.class_name_entry.get()
+
+    def erase(self) -> None:
+        """Remove text from widgets"""
+        self.class_name_entry.delete(0, tk.END)

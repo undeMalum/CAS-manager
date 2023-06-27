@@ -27,14 +27,14 @@ class ModesNotebook(ttk.Notebook):
 
         # Give functionalities to Tabs
         self.class_entries_add = data_entries.ClassEntriesFrame(self.add_class)
-        self.class_entries_add.grid(row=0, column=0)
+        self.class_entries_add.grid(row=0, column=0, sticky=tk.NSEW)
         self.class_entries_update = data_entries.ClassEntriesFrame(self.update_class)
-        self.class_entries_update.grid(row=0, column=0)
+        self.class_entries_update.grid(row=0, column=0, sticky=tk.NSEW)
 
         self.students_entries_add = data_entries.StudentEntriesFrame(self.add_student)
-        self.students_entries_add.grid(row=0, column=0)
+        self.students_entries_add.grid(row=0, column=0, sticky=tk.NSEW)
         self.students_entries_update = data_entries.StudentEntriesFrame(self.update_student)
-        self.students_entries_update.grid(row=0, column=0)
+        self.students_entries_update.grid(row=0, column=0, sticky=tk.NSEW)
 
     def give_weight(self):
         self.add_class.columnconfigure(index=0, weight=1)
@@ -44,7 +44,13 @@ class ModesNotebook(ttk.Notebook):
         self.update_class.rowconfigure(index=0, weight=1)
 
         self.add_student.columnconfigure(index=0, weight=1)
+        self.add_student.rowconfigure(index=0, weight=1)
+
+        self.update_student.columnconfigure(index=0, weight=1)
         self.update_student.rowconfigure(index=0, weight=1)
+
+    def return_current_tab(self):
+        return self.index(self.select())
 
 
 if __name__ == "__main__":
@@ -60,7 +66,7 @@ if __name__ == "__main__":
 
     # Set the Forest-ttk-theme with the theme_use method
     style.theme_use("forest-dark")
-    add_frame = ModesNotebook(root)
-    add_frame.pack()
+    notebook = ModesNotebook(root)
+    notebook.pack()
 
     root.mainloop()

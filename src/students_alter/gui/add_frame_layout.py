@@ -9,7 +9,7 @@ class AddFrame(ttk.LabelFrame):
         super().__init__(root, text="Choose mode", *args, **kwargs)
 
         self.modes_notebook = modes_frames.ModesNotebook(self)
-        self.modes_notebook.grid(row=0, column=0)
+        self.modes_notebook.grid(row=0, column=0, sticky=tk.NSEW)
         self.columnconfigure(index=0, weight=1)
         self.rowconfigure(index=0, weight=1)
 
