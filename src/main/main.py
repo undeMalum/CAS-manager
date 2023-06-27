@@ -127,18 +127,19 @@ class MainWindow(tk.Tk):
 
     def confirm_update(self):
         """Function that alters db based on the input from the add frame."""
+        class_name = self.display_settings.class_name_combobox.get()
         tab_index_parameters_and_class = {
-            0: (imp.NewClass, self.add_frame.modes_notebook.class_entries_add, False),
-            1: (imp.UpdateClass, self.add_frame.modes_notebook.class_entries_update, False),
-            2: (imp.NewStudent, self.add_frame.modes_notebook.students_entries_add, False),
-            3: (imp.UpdateStudent, self.add_frame.modes_notebook.students_entries_update, True)
+            0: (imp.NewClass, (self.add_frame.modes_notebook.class_entries_add, None), False),
+            1: (imp.UpdateClass, (self.add_frame.modes_notebook.class_entries_update, class_name), False),
+            2: (imp.NewStudent, (self.add_frame.modes_notebook.students_entries_add, class_name), False),
+            3: (imp.UpdateStudent, (self.add_frame.modes_notebook.students_entries_update, class_name), True)
         }
 
         self.update_db_button.choose_mode_add(
             *tab_index_parameters_and_class[self.add_frame.modes_notebook.index(
                 self.add_frame.modes_notebook.select()
             )],
-            self.students_view
+            self.students_view.students_treeview
         )
 
         self.display_settings.provide_values_for_class_names_combobox()

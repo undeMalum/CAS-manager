@@ -83,7 +83,7 @@ class ClassEntriesFrame(ttk.Frame, DataEntries):
         self.class_name_entry.grid(column=1, row=0, padx=PAD_X, pady=PAD_Y, sticky=tk.E)
 
     def return_entries_values(self):
-        return self.class_name_entry.get()
+        return self.class_name_entry.get(),
 
     def erase(self) -> None:
         """Remove text from widgets"""

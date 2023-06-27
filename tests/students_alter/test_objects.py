@@ -3,7 +3,6 @@ import pytest
 from src.students_alter.db.inserting_updating_interacting_with_db import (manage_interaction_with_db,
                                                                           create_mode_to_object_dict)
 import src.students_alter.db.implementing_alter_abc as imp
-from src.students_alter.add_modes import AddMode
 from src.database_management import db_manager
 
 
