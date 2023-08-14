@@ -18,7 +18,8 @@ def exists_in_db(value: (str,), column: str = "class_name") -> bool:
 
 
 class ValidationTemplate:
-    """Implements getter (with set_name) methods for all validation descriptors"""
+    """Implements getter (with set_name) methods
+    for all validation descriptors"""
     def __set_name__(self, owner, name):
         self.name = name
 

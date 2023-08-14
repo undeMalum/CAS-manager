@@ -170,7 +170,7 @@ class MainWindow(tk.Tk):
     def remove_from_student_view(self) -> str:
         """Function that removes either individual students or entire class of students."""
 
-        if self.view_tools.delete_combobox.get() == "student":
+        if self.view_tools.delete_combobox.get() == "student(s)":
             selected_students = self.students_view.students_treeview.selection()
             if not selected_students:
                 return tk.messagebox.showerror("Error", "Choose a student!")
