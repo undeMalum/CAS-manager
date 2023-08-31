@@ -31,7 +31,7 @@ def construct_dict_key(class_name: str, surname: str) -> (str, str):
         and_needed = False
         with_surname = ""
 
-    condition = f"{with_class} {and_needed_dict[and_needed]} {with_surname}"  # construct temp condition
+    condition = f"{with_class} {and_needed_dict[and_needed]} {with_surname}".strip()  # construct temp condition
 
     return f"WHERE {condition}" if with_class or with_surname else ""  # if condition is needed, add where clause
 

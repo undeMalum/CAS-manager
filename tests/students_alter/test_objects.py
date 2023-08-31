@@ -29,10 +29,10 @@ def test_create_mode_to_object_dict(chosen_class: str, class_name: str,
     )
 
     to_compare = {
-        AddMode.UPDATE_CLASS: (imp.UpdateClass, chosen_class, class_name),
-        AddMode.NEW_CLASS: (imp.NewClass, class_name),
-        AddMode.UPDATE_STUDENT: (imp.UpdateStudent, student_id, first_name, surname, url, chosen_class),
-        AddMode.NEW_STUDENT: (imp.NewStudent, first_name, surname, url, chosen_class)
+        AddMode.UPDATE_CLASS.value: (imp.UpdateClass, chosen_class, class_name),
+        AddMode.NEW_CLASS.value: (imp.NewClass, class_name),
+        AddMode.UPDATE_STUDENT.value: (imp.UpdateStudent, student_id, first_name, surname, url, chosen_class),
+        AddMode.NEW_STUDENT.value: (imp.NewStudent, first_name, surname, url, chosen_class)
     }
 
     assert mapped == to_compare
@@ -43,10 +43,10 @@ def test_create_mode_to_object_dict(chosen_class: str, class_name: str,
                             class_name, student_id,
                             first_name, surname, 
                             url""", [
-    (AddMode.NEW_CLASS, "n", "n", 1, "n", "n", "n"),
-    (AddMode.UPDATE_CLASS, "n", "o", 1, "n", "n", "n"),
-    (AddMode.NEW_STUDENT, "o", "n", 1, "n", "n", "https://undemalum.github.io/portfolio/posts/school-festival/"),
-    (AddMode.UPDATE_STUDENT, "o", "n", 11, "n", "n", "https://undemalum.github.io/portfolio/posts/school-festival/")
+    (AddMode.NEW_CLASS.value, "n", "n", 1, "n", "n", "n"),
+    (AddMode.UPDATE_CLASS.value, "n", "o", 1, "n", "n", "n"),
+    (AddMode.NEW_STUDENT.value, "o", "n", 1, "n", "n", "https://undemalum.github.io/portfolio/posts/school-festival/"),
+    (AddMode.UPDATE_STUDENT.value, "o", "n", 11, "n", "n", "https://undemalum.github.io/portfolio/posts/school-festival/")
 ])
 def test_manage_interaction_with_db_true(mode: AddMode, chosen_class: str,
                                          class_name: str, student_id: int,
@@ -74,11 +74,11 @@ def test_manage_interaction_with_db_true(mode: AddMode, chosen_class: str,
                             class_name, student_id, 
                             first_name, surname,
                             url, error_description""", [
-    (AddMode.UPDATE_CLASS, "", "", "", 1, "", "", "Choose class to be updated!"),
-    (AddMode.UPDATE_CLASS, "o", "", "", 1, "", "", "Given class already exists or is not given!"),
-    (AddMode.UPDATE_CLASS, "n", "n", "", 1, "", "", "Choose class to be updated!"),
-    (AddMode.NEW_STUDENT, "n", "n", "", 1, "", "", "Provided data is incorrect."),
-    (AddMode.NEW_STUDENT, "n", "n", "n", 1, "n", "", "Website with given url does not exist.")
+    (AddMode.UPDATE_CLASS.value, "", "", "", 1, "", "", "Choose class!"),
+    (AddMode.UPDATE_CLASS.value, "o", "", "", 1, "", "", "Given class already exists or is not given!"),
+    (AddMode.UPDATE_CLASS.value, "n", "n", "", 1, "", "", "Choose class!"),
+    (AddMode.NEW_STUDENT.value, "n", "n", "", 1, "", "", "Provided data is incorrect."),
+    (AddMode.NEW_STUDENT.value, "n", "n", "n", 1, "n", "", "Website with given url does not exist.")
 ])
 def test_manage_interaction_with_db_false(mode: AddMode, chosen_class: str,
                                           class_name: str, student_id: int,
