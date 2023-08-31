@@ -25,7 +25,7 @@ def transfer_spreadsheet_to_db(file_path: Path):
             sheet[f"D{row+1}"] = "no"
         else:
             student_db.alter()
-            sheet[f"D{row + 1}"] = "yes"
+            sheet[f"D{row+1}"] = "yes"
 
     red_background = PatternFill(fgColor="00FF0000")
     diff_style = DifferentialStyle(fill=red_background)

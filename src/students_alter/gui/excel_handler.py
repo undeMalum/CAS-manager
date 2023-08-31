@@ -48,11 +48,13 @@ class ExcelHandler(ttk.Frame):
             sheet["E1"] = class_name
 
             class_name_dir = Path(__name__).resolve().parent.parent.parent.parent.parent
-            workbook.save(filename=class_name_dir.joinpath(f"{class_name}.xlsx"))
+            class_name_spreadsheet = class_name_dir.joinpath(f"{class_name}.xlsx")
+            workbook.save(filename=class_name_spreadsheet)
 
-            message = "Spreadsheet created successfully!"
+            message = f"""Spreadsheet created successfully!
+To open the file, go to: {class_name_spreadsheet}"""
         else:
-            message = "Failed to create spreadsheet."
+            message = "Failed to create a spreadsheet."
         info = "Spreadsheet creation status"
 
         return tk.messagebox.showinfo(info, message)
@@ -70,3 +72,6 @@ class ExcelHandler(ttk.Frame):
         self.load_spreadsheet_button.grid(column=0, row=0, padx=PAD_X, pady=PAD_Y, sticky=tk.EW)
         self.spreadsheet_path_entry.grid(column=1, row=1, padx=PAD_X, pady=PAD_Y, sticky=tk.EW)
         self.spreadsheet_path_label.grid(column=0, row=1, padx=PAD_X, pady=PAD_Y, sticky=tk.E)
+
+    def erase(self):
+        self.spreadsheet_path_entry.delete(0, tk.END)
