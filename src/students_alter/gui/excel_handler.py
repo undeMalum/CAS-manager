@@ -73,5 +73,8 @@ To open the file, go to: {class_name_spreadsheet}"""
         self.spreadsheet_path_entry.grid(column=1, row=1, padx=PAD_X, pady=PAD_Y, sticky=tk.EW)
         self.spreadsheet_path_label.grid(column=0, row=1, padx=PAD_X, pady=PAD_Y, sticky=tk.E)
 
+    def return_entries_values(self):
+        return self.spreadsheet_path_entry.get(),
+
     def erase(self):
         self.spreadsheet_path_entry.delete(0, tk.END)

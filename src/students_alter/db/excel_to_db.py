@@ -8,28 +8,47 @@ from openpyxl.formatting.rule import Rule
 from src.students_alter.db import implementing_alter_abc as imp
 
 
-def transfer_spreadsheet_to_db(file_path: Path):
-    workbook = load_workbook(file_path)
-    sheet = workbook.active
-    sheet["D1"] = "added"
+class AddStudents:
+    def __init__(self, file_path: str):
+        self.file_path = Path(file_path)
+        if not self.file_path.is_file():
+            raise ValueError("""Incorrect path!
+Make to provide a full path.""")
+        if self.file_path.suffix != ".xlsx":
+            raise ValueError("""Incorrect file type!
+Make sure the extension is 'xlsx'""")
 
-    for row, student_ex in enumerate(sheet.iter_rows(min_row=2, values_only=True)):
-        try:
-            student_db = imp.NewStudent(
-                student_ex[0],
-                student_ex[1],
-                student_ex[2],
-                sheet["E1"]
-            )
-        except ValueError:
-            sheet[f"D{row+1}"] = "no"
-        else:
-            student_db.alter()
-            sheet[f"D{row+1}"] = "yes"
+        self.workbook = load_workbook(self.file_path)
+        self.sheet = self.workbook.active
 
-    red_background = PatternFill(fgColor="00FF0000")
-    diff_style = DifferentialStyle(fill=red_background)
-    rule = Rule(type="expression", dxf=diff_style)
-    rule.formula = ["$D1=no"]
-    sheet.conditional_formatting.add(rule)
-    workbook.save(file_path)
+        self.new_class = imp.NewClass(self.sheet["E1"].value)
+        self.new_class.alter()
+
+    def alter(self):
+        self.sheet["D1"] = "added"
+
+        for row, student_ex in enumerate(self.sheet.iter_rows(min_row=2, values_only=True)):
+            try:
+                student_db = imp.NewStudent(
+                    student_ex[0],
+                    student_ex[1],
+                    student_ex[2],
+                    self.sheet["E1"].value
+                )
+            except ValueError:
+                self.sheet[f"D{row + 1}"] = "no"
+            else:
+                student_db.alter()
+                self.sheet[f"D{row + 1}"] = "yes"
+
+        red_background = PatternFill(fgColor="00FF0000")
+        diff_style = DifferentialStyle(fill=red_background)
+        rule = Rule(type="expression", dxf=diff_style)
+        rule.formula = ["$D2=no"]
+        self.sheet.conditional_formatting.add("A2:XFD1048576", rule)
+        self.workbook.save(self.file_path)
+
+
+if __name__ == "__main__":
+    path = r"C:\Users\Mateusz\Downloads\criterion_B_rot_draft.xlsx"
+    new_student = AddStudents(path)
