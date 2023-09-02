@@ -1,4 +1,4 @@
-from requests import get, exceptions
+import requests
 
 from src.database_management import db_manager
 
@@ -37,12 +37,11 @@ class DataIsGiven(ValidationTemplate):
 class URLIsCorrect(ValidationTemplate):
     """Make sure that the given url exists"""
     def __set__(self, instance, value):
-        try:
-            get(value)
-        except exceptions.RequestException:
+        """https://stackoverflow.com/a/36506063"""
+        ret = requests.head(value)
+        if ret.status_code >= 400:
             raise ValueError("Website with given url does not exist.") from None
-        else:
-            instance.__dict__[self.name] = value
+        instance.__dict__[self.name] = value
 
 
 class RepeatsInDB(ValidationTemplate):

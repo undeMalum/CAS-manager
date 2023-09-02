@@ -26,7 +26,7 @@ class UpdateDBButton(ttk.Button):
         elif entries_class[1] is None:
             parameters_to_be_used = entries_class[0].return_entries_values()
         else:
-            parameters_to_be_used = (entries_class[1], *entries_class[0].return_entries_values())
+            parameters_to_be_used = (*entries_class[0].return_entries_values(), entries_class[1])
 
         # call to the db
         info, description = db_interaction.manage_interaction_with_db(

@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from openpyxl import load_workbook
-from openpyxl.styles import PatternFill
+from openpyxl.styles import PatternFill, colors
 from openpyxl.styles.differential import DifferentialStyle
 from openpyxl.formatting.rule import Rule
 
@@ -41,12 +41,12 @@ Make sure the extension is 'xlsx'""")
                 student_db.alter()
                 self.sheet[f"D{row + 2}"] = "yes"
 
-        # red_background = PatternFill(fgColor="00FF0000")
-        # diff_style = DifferentialStyle(fill=red_background)
-        # rule = Rule(type="expression", dxf=diff_style)
-        # rule.formula = ["$D1='no'"]
-        # self.sheet.conditional_formatting.add("A1:E100", rule)
-        # self.workbook.save(self.file_path)
+        red_background = PatternFill(bgColor=colors.Color(rgb="f70523"))
+        diff_style = DifferentialStyle(fill=red_background)
+        rule = Rule(type="expression", dxf=diff_style)
+        rule.formula = ['$D1="no"']
+        self.sheet.conditional_formatting.add("A1:E100", rule)
+        self.workbook.save(self.file_path)
 
 
 if __name__ == "__main__":
