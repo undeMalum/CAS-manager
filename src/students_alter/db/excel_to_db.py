@@ -36,17 +36,17 @@ Make sure the extension is 'xlsx'""")
                     self.sheet["E1"].value
                 )
             except ValueError:
-                self.sheet[f"D{row + 1}"] = "no"
+                self.sheet[f"D{row + 2}"] = "no"
             else:
                 student_db.alter()
-                self.sheet[f"D{row + 1}"] = "yes"
+                self.sheet[f"D{row + 2}"] = "yes"
 
-        red_background = PatternFill(fgColor="00FF0000")
-        diff_style = DifferentialStyle(fill=red_background)
-        rule = Rule(type="expression", dxf=diff_style)
-        rule.formula = ["$D2=no"]
-        self.sheet.conditional_formatting.add("A2:XFD1048576", rule)
-        self.workbook.save(self.file_path)
+        # red_background = PatternFill(fgColor="00FF0000")
+        # diff_style = DifferentialStyle(fill=red_background)
+        # rule = Rule(type="expression", dxf=diff_style)
+        # rule.formula = ["$D1='no'"]
+        # self.sheet.conditional_formatting.add("A1:E100", rule)
+        # self.workbook.save(self.file_path)
 
 
 if __name__ == "__main__":

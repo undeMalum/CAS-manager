@@ -60,7 +60,7 @@ To open the file, go to: {class_name_spreadsheet}"""
         return tk.messagebox.showinfo(info, message)
 
     def load_spreadsheet(self):
-        filename = filedialog.askopenfilename(initialdir="/",
+        filename = filedialog.askopenfilename(initialdir=str(Path.home()),
                                               title="Select a File",
                                               filetypes=(("Excel files", "*.xlsx"),)
                                               )
