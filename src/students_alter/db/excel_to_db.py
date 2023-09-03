@@ -19,6 +19,10 @@ Make to provide a full path.""")
 Make sure the extension is 'xlsx'""")
 
         self.workbook = load_workbook(self.file_path)
+        try:
+            self.workbook.save(self.file_path)
+        except PermissionError:
+            raise ValueError(f"Close the Excel file: {self.file_path}")
         self.sheet = self.workbook.active
 
         self.new_class = imp.NewClass(self.sheet["E1"].value)

@@ -47,7 +47,7 @@ class ExcelHandler(ttk.Frame):
             sheet["C1"] = "url"
             sheet["E1"] = class_name
 
-            class_name_dir = Path(__name__).resolve().parent.parent.parent.parent.parent
+            class_name_dir = Path.home()
             class_name_spreadsheet = class_name_dir.joinpath(f"{class_name}.xlsx")
             workbook.save(filename=class_name_spreadsheet)
 

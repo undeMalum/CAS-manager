@@ -38,7 +38,11 @@ class URLIsCorrect(ValidationTemplate):
     """Make sure that the given url exists"""
     def __set__(self, instance, value):
         """https://stackoverflow.com/a/36506063"""
-        ret = requests.head(value)
+        try:
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; rv:36.0) ..'}
+            ret = requests.get(value, timeout=10, headers=headers)
+        except requests.exceptions.ConnectionError or requests.exceptions.ReadTimeout:
+            raise ValueError("Website with given url does not exist.") from None
         if ret.status_code >= 400:
             raise ValueError("Website with given url does not exist.") from None
         instance.__dict__[self.name] = value
