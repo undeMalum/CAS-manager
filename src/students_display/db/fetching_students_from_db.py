@@ -7,7 +7,7 @@ convert_gui_str_to_sql_asc_desc = {
 }
 
 
-def construct_dict_key(class_name: str, surname: str) -> (str, str):
+def construct_where_clause(class_name: str, surname: str) -> (str, str):
     """
     Created search condition.
 
@@ -72,7 +72,7 @@ def get_students(sorting_element: str, sorting_order: str, class_name: str, surn
     }
 
     # The appropriate where clause for constructing the query
-    where_clause = construct_dict_key(class_name, surname)
+    where_clause = construct_where_clause(class_name, surname)
 
     # Construct query
     prompt = construct_query_for_fetching_students(sorting_element, sorting_order, where_clause)
@@ -92,5 +92,5 @@ def get_students(sorting_element: str, sorting_order: str, class_name: str, surn
 
 
 if __name__ == "__main__":
-    concant = construct_dict_key("-None-", "")
+    concant = construct_where_clause("-None-", "")
     print(concant)

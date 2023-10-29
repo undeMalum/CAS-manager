@@ -18,13 +18,10 @@ def get_class_names() -> list[str]:
 
     # The first value of classes combobox must be '-None-',
     # indicating that no class is chosen.
-    class_combobox_values = ["-None-"]
-
     # fetched_values are in format: [('IIA',), ('IO',), ('IIB',)]
     # and must be transferred to: ['IIA', 'IO', 'IIB']
     # in class_combobox_values
-    for value in fetched_values:
-        class_combobox_values.append(value[0])
+    class_combobox_values = ["-None-"] + [value[0] for value in fetched_values]
 
     return class_combobox_values
 
