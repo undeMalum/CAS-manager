@@ -14,12 +14,12 @@ from tests.students_display.fetching_predicted_values.fetch_no_students import (
 
 @pytest.mark.fetching
 @pytest.mark.parametrize("sorting_element, sorting_order, class_name, predicted_values", [
-    ("first_name", "A-Z", "IIIA", values_ordered_by_first_name_dict["values_first_name_asc_class"]),
-    ("first_name", "Z-A", "IIIA", values_ordered_by_first_name_dict["values_first_name_desc_class"]),
+    ("first_name", "A-Z", "IIB", values_ordered_by_first_name_dict["values_first_name_asc_class"]),
+    ("first_name", "Z-A", "IIB", values_ordered_by_first_name_dict["values_first_name_desc_class"]),
     ("first_name", "A-Z", "-None-", values_ordered_by_first_name_dict["values_first_name_asc_no_class"]),
     ("first_name", "Z-A", "-None-", values_ordered_by_first_name_dict["values_first_name_desc_no_class"]),
-    ("surname", "A-Z", "IIIA", values_ordered_by_surname_dict["values_surname_asc_class"]),
-    ("surname", "Z-A", "IIIA", values_ordered_by_surname_dict["values_surname_desc_class"]),
+    ("surname", "A-Z", "IIB", values_ordered_by_surname_dict["values_surname_asc_class"]),
+    ("surname", "Z-A", "IIB", values_ordered_by_surname_dict["values_surname_desc_class"]),
     ("surname", "A-Z", "-None-", values_ordered_by_surname_dict["values_surname_asc_no_class"]),
     ("surname", "Z-A", "-None-", values_ordered_by_surname_dict["values_surname_desc_no_class"])
 ])

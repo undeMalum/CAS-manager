@@ -20,7 +20,7 @@ prompt_students_from_class_asc = """
         FROM students
         INNER JOIN classes 
         ON students.class_id = classes.class_id
-        WHERE class_name = 'IIIA'
+        WHERE class_name = 'IIB'
         ORDER BY {} ASC;
 """
 
@@ -29,7 +29,7 @@ prompt_students_from_class_desc = """
         FROM students
         INNER JOIN classes 
         ON students.class_id = classes.class_id
-        WHERE class_name = 'IIIA'
+        WHERE class_name = 'IIB'
         ORDER BY {} DESC;
 """
 

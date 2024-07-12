@@ -6,7 +6,7 @@ class UpdateClass(base.AlterDB):
     __old_class_name = validation_descriptors.UpdatingNameExists()
     __new_class_name = validation_descriptors.RepeatsInDB()
 
-    def __init__(self, old_class_name: str, new_class_name: str):
+    def __init__(self, new_class_name: str, old_class_name: str):
         super().__init__()
         self.__old_class_name = old_class_name
         self.__new_class_name = new_class_name

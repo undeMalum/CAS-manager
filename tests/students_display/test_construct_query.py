@@ -47,17 +47,17 @@ prompt_template_desc_first_name = """
 
 
 Without_classWithout_surname = ""
-With_classWithout_surname = "WHERE class_name = (:class_name)"
+With_classWithout_surname = "WHERE class_name = (:class_name)  "
 With_classWith_surname = "WHERE class_name = (:class_name) AND surname LIKE 'Bolly%'"
-Without_classWith_surname = "WHERE surname LIKE 'Bolly%'"
+Without_classWith_surname = "WHERE   surname LIKE 'Bolly%'"
 
 
 @pytest.mark.constructing
 @pytest.mark.parametrize("class_name, surname, predicted_where_clause", [
-    ("-None-", "", Without_classWithout_surname),
-    ("IIIA", "", With_classWithout_surname),
-    ("IIIA", "Bolly", With_classWith_surname),
-    ("-None-", "Bolly", Without_classWith_surname)
+    ("-None-", "", "without_class-without_surname"),
+    ("IIIA", "", "with_class-without_surname"),
+    ("IIIA", "Bolly", "with_class-with_surname"),
+    ("-None-", "Bolly", "without_class-with_surname")
 ])
 def test_construct_dict_key(class_name: str, surname: str, predicted_where_clause: str):
     where_clause = construct_dict_key(class_name, surname)
@@ -66,29 +66,29 @@ def test_construct_dict_key(class_name: str, surname: str, predicted_where_claus
 
 
 @pytest.mark.constructing
-@pytest.mark.parametrize("sorting_element, sorting_order, dict_key, predicted_query", [
+@pytest.mark.parametrize("sorting_element, sorting_order, where_clause, predicted_query", [
     ("surname", "A-Z", Without_classWithout_surname,
      prompt_template_asc_surname.format(Without_classWithout_surname)),
 
-    ("surname", "Z-A", Without_classWithout_surname,
+    ("surname", "Z-A", "without_class-without_surname",
      prompt_template_desc_surname.format(Without_classWithout_surname)),
 
-    ("surname", "A-Z", With_classWithout_surname,
+    ("surname", "A-Z", "with_class-without_surname",
      prompt_template_asc_surname.format(With_classWithout_surname)),
 
-    ("surname", "Z-A", With_classWithout_surname,
+    ("surname", "Z-A", "with_class-without_surname",
      prompt_template_desc_surname.format(With_classWithout_surname)),
 
-    ("surname", "A-Z", With_classWith_surname,
+    ("surname", "A-Z", "with_class-with_surname",
      prompt_template_asc_surname.format(With_classWith_surname)),
 
-    ("surname", "Z-A", With_classWith_surname,
+    ("surname", "Z-A", "with_class-with_surname",
      prompt_template_desc_surname.format(With_classWith_surname)),
 
-    ("surname", "A-Z", Without_classWith_surname,
+    ("surname", "A-Z", "without_class-with_surname",
      prompt_template_asc_surname.format(Without_classWith_surname)),
 
-    ("surname", "Z-A", Without_classWith_surname,
+    ("surname", "Z-A", "without_class-with_surname",
      prompt_template_desc_surname.format(Without_classWith_surname))
 ])
 def test_construct_query_for_fetching_students_by_surname(sorting_element: str, sorting_order: str,
@@ -100,28 +100,28 @@ def test_construct_query_for_fetching_students_by_surname(sorting_element: str, 
 
 @pytest.mark.constructing
 @pytest.mark.parametrize("sorting_element, sorting_order, dict_key, predicted_query", [
-    ("first_name", "A-Z", Without_classWithout_surname,
+    ("first_name", "A-Z", "without_class-without_surname",
      prompt_template_asc_first_name.format(Without_classWithout_surname)),
 
-    ("first_name", "Z-A", Without_classWithout_surname,
+    ("first_name", "Z-A", "without_class-without_surname",
      prompt_template_desc_first_name.format(Without_classWithout_surname)),
 
-    ("first_name", "A-Z", With_classWithout_surname,
+    ("first_name", "A-Z", "with_class-without_surname",
      prompt_template_asc_first_name.format(With_classWithout_surname)),
 
-    ("first_name", "Z-A", With_classWithout_surname,
+    ("first_name", "Z-A", "with_class-without_surname",
      prompt_template_desc_first_name.format(With_classWithout_surname)),
 
-    ("first_name", "A-Z", With_classWith_surname,
+    ("first_name", "A-Z", "with_class-with_surname",
      prompt_template_asc_first_name.format(With_classWith_surname)),
 
-    ("first_name", "Z-A", With_classWith_surname,
+    ("first_name", "Z-A", "with_class-with_surname",
      prompt_template_desc_first_name.format(With_classWith_surname)),
 
-    ("first_name", "A-Z", Without_classWith_surname,
+    ("first_name", "A-Z", "without_class-with_surname",
      prompt_template_asc_first_name.format(Without_classWith_surname)),
 
-    ("first_name", "Z-A", Without_classWith_surname,
+    ("first_name", "Z-A", "without_class-with_surname",
      prompt_template_desc_first_name.format(Without_classWith_surname))
 ])
 def test_construct_query_for_fetching_students_by_first_name(sorting_element: str, sorting_order: str,

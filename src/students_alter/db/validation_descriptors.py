@@ -1,4 +1,4 @@
-from requests import get, exceptions
+import requests
 
 from src.database_management import db_manager
 
@@ -38,12 +38,15 @@ class DataIsGiven(ValidationTemplate):
 class URLIsCorrect(ValidationTemplate):
     """Make sure that the given url exists"""
     def __set__(self, instance, value):
+        """https://stackoverflow.com/a/36506063"""
         try:
-            get(value)
-        except exceptions.RequestException:
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; rv:36.0) ..'}
+            ret = requests.get(value, timeout=10, headers=headers)
+        except requests.exceptions.ConnectionError or requests.exceptions.ReadTimeout:
             raise ValueError("Website with given url does not exist.") from None
-        else:
-            instance.__dict__[self.name] = value
+        if ret.status_code >= 400:
+            raise ValueError("Website with given url does not exist.") from None
+        instance.__dict__[self.name] = value
 
 
 class RepeatsInDB(ValidationTemplate):
@@ -58,6 +61,6 @@ class RepeatsInDB(ValidationTemplate):
 class UpdatingNameExists(ValidationTemplate):
     """Make sure that the user chose class, that is, the old_class_name was chosen"""
     def __set__(self, instance, value):
-        if not exists_in_db(value):
+        if not exists_in_db(value) or value == "-None-":
             raise ValueError("Choose class!") from None
         instance.__dict__[self.name] = value

@@ -11,7 +11,9 @@ class SQLite:
 
     def __enter__(self):
         self.conn = sqlite3.connect(self.file)
-        return self.conn.cursor()
+        self.cur = self.conn.cursor()
+        self.cur.execute("PRAGMA foreign_keys = ON")
+        return self.cur
 
     def __exit__(self, type_, value, traceback):
         if traceback is None:

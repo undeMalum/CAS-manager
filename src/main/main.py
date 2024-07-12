@@ -6,6 +6,8 @@ from src.paths.theme_path import (
     THEME_LIGHT
 )
 
+from src.students_alter.db import implementing_alter_abc as imp
+from src.students_alter.db import excel_to_db
 from src.students_display.gui import (
     view_tools,
     display_settings,
@@ -95,13 +97,9 @@ class MainWindow(tk.Tk):
     def switch_theme(self):
         if not self.theme.get():
             self.configure(background="#313131")
-            self.add_frame.data_entries_frame.students_frame.configure(background="#313131")
-            self.add_frame.data_entries_frame.classes_frame.configure(background="#313131")
             self.style.theme_use("forest-dark")
         else:
             self.configure(background="#ffffff")
-            self.add_frame.data_entries_frame.students_frame.configure(background="#ffffff")
-            self.add_frame.data_entries_frame.classes_frame.configure(background="#ffffff")
             self.style.theme_use("forest-light")
 
     def alter_students_view(self, surname: str = ""):
@@ -130,14 +128,20 @@ class MainWindow(tk.Tk):
 
     def confirm_update(self):
         """Function that alters db based on the input from the add frame."""
+        class_name = self.display_settings.class_name_combobox.get()
+        tab_index_parameters_and_class = {
+            0: (imp.NewClass, (self.add_frame.modes_notebook.class_entries_add, None), False),
+            1: (imp.UpdateClass, (self.add_frame.modes_notebook.class_entries_update, class_name), False),
+            2: (imp.NewStudent, (self.add_frame.modes_notebook.students_entries_add, class_name), False),
+            3: (imp.UpdateStudent, (self.add_frame.modes_notebook.students_entries_update, class_name), True),
+            4: (excel_to_db.AddStudents, (self.add_frame.modes_notebook.handle_excel_tab, None), False)
+        }
+
         self.update_db_button.choose_mode_add(
-            self.add_frame.modes_frame.mode.get(),
-            self.display_settings.class_name_combobox,
-            self.add_frame.data_entries_frame.classes_frame.class_name_entry,
-            self.students_view.students_treeview,
-            self.add_frame.data_entries_frame.students_frame.first_name_entry,
-            self.add_frame.data_entries_frame.students_frame.surname_entry,
-            self.add_frame.data_entries_frame.students_frame.url_entry
+            *tab_index_parameters_and_class[self.add_frame.modes_notebook.index(
+                self.add_frame.modes_notebook.select()
+            )],
+            self.students_view.students_treeview
         )
 
         self.display_settings.provide_values_for_class_names_combobox()
